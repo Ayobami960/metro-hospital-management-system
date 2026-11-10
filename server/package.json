@@ -73,6 +73,7 @@
     "typescript-eslint": "^8.72.0"
   },
   "allowScripts": {
-    "argon2@0.45.1": true
+    "esbuild": true,
+    "argon2": true
   }
 }
