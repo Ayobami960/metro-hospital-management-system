@@ -1,5 +1,5 @@
 import { Router } from "express";
-import rateLimit, { ipKeyGenerator } from "express-rate-limit";
+import { ipKeyGenerator, rateLimit } from "express-rate-limit";
 import { z } from "zod";
 import { eq } from "drizzle-orm";
 import { authenticate, currentActor, currentSessionId } from "../middleware/authenticate.js";

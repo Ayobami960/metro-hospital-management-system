@@ -1,5 +1,5 @@
 import { Router } from "express";
-import rateLimit, { ipKeyGenerator } from "express-rate-limit";
+import { ipKeyGenerator, rateLimit } from "express-rate-limit";
 import { z } from "zod";
 import { sql } from "drizzle-orm";
 import { db } from "../db/client.js";

@@ -1,5 +1,5 @@
 import { Router } from "express";
-import rateLimit, { ipKeyGenerator } from "express-rate-limit";
+import { ipKeyGenerator, rateLimit } from "express-rate-limit";
 import { z } from "zod";
 import { authenticate, currentActor } from "../middleware/authenticate.js";
 import { validate } from "../middleware/validate.js";
