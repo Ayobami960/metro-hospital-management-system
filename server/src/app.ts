@@ -1,5 +1,5 @@
-import express, { type Express } from "express";
-import * as helmet from "helmet";
+import express, { type Express, type RequestHandler } from "express";
+import { createRequire } from "node:module";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import compression from "compression";
@@ -42,6 +42,9 @@ import { roomAccessRouter } from "./routes/room-access.routes.js";
 import { openApiDocument } from "./openapi.js";
 
 const API = "/api/v1";
+const helmet = createRequire(import.meta.url)("helmet") as (
+  options: { crossOriginResourcePolicy: { policy: "cross-origin" } },
+) => RequestHandler;
 
 export const createApp = (): Express => {
   const app = express();
@@ -49,7 +52,7 @@ export const createApp = (): Express => {
   app.set("trust proxy", env.trustProxy);
 
   app.use(requestId);
-  app.use(helmet.default({ crossOriginResourcePolicy: { policy: "cross-origin" } }));
+  app.use(helmet({ crossOriginResourcePolicy: { policy: "cross-origin" } }));
   app.use(cors({ origin: [env.frontendOrigin], credentials: true, methods: ["GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"] }));
   app.use(compression());
 
