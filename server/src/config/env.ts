@@ -23,7 +23,7 @@ const isPostgresDatabaseUrl = (value: string): boolean => {
 
 const schema = z.object({
   NODE_ENV: z.enum(["development", "test", "production"]),
-  PORT: int.positive(),
+  PORT: int.positive().default(3000),
   APP_NAME: z.string().min(1),
   HOSPITAL_NAME: z.string().min(1),
   DATABASE_URL: z

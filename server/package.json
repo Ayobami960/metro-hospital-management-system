@@ -27,7 +27,6 @@
   "dependencies": {
     "@neondatabase/serverless": "^1.2.0",
     "@types/pdfkit": "^0.14.0",
-    "argon2": "^0.45.1",
     "better-auth": "^1.7.12",
     "cloudinary": "^2.11.0",
     "compression": "^1.8.2",
@@ -39,6 +38,7 @@
     "express": "^5.3.0",
     "express-rate-limit": "^8.7.1",
     "file-type": "^22.2.0",
+    "hash-wasm": "^4.13.0",
     "helmet": "^8.3.0",
     "jose": "^6.2.13",
     "multer": "^2.5.0",
@@ -48,7 +48,6 @@
     "pg": "^8.23.1",
     "pino": "^10.4.0",
     "pino-http": "^11.0.0",
-    "sharp": "^0.35.5",
     "socket.io": "^4.8.4",
     "ws": "^8.22.0",
     "zod": "^4.6.7"
@@ -73,7 +72,6 @@
     "typescript-eslint": "^8.72.0"
   },
   "allowScripts": {
-    "esbuild": true,
-    "argon2": true
+    "esbuild": true
   }
 }

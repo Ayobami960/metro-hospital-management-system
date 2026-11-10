@@ -1,5 +1,5 @@
 import crypto from "node:crypto";
-import argon2 from "argon2";
+import { argon2id, argon2Verify } from "hash-wasm";
 
 /**
  * Secret-code primitives shared by the daily email code and TOTP recovery
@@ -31,18 +31,19 @@ export const normalizeSecretCode = (value: string): string =>
   value.replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
 
 const ARGON_OPTIONS = {
-  type: argon2.argon2id,
-  memoryCost: 19_456,
-  timeCost: 2,
+  iterations: 2,
+  memorySize: 19_456,
   parallelism: 1,
   hashLength: 32,
+  outputType: "encoded",
 } as const;
 
-export const hashSecret = (plain: string): Promise<string> => argon2.hash(plain, ARGON_OPTIONS);
+export const hashSecret = (plain: string): Promise<string> =>
+  argon2id({ ...ARGON_OPTIONS, password: plain, salt: crypto.randomBytes(16) });
 
 export const verifySecret = async (hash: string, plain: string): Promise<boolean> => {
   try {
-    return await argon2.verify(hash, plain);
+    return await argon2Verify({ hash, password: plain });
   } catch {
     return false;
   }
