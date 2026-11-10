@@ -1,5 +1,5 @@
 import express, { type Express } from "express";
-import { default as helmet } from "helmet";
+import * as helmet from "helmet";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import compression from "compression";
@@ -49,7 +49,7 @@ export const createApp = (): Express => {
   app.set("trust proxy", env.trustProxy);
 
   app.use(requestId);
-  app.use(helmet({ crossOriginResourcePolicy: { policy: "cross-origin" } }));
+  app.use(helmet.default({ crossOriginResourcePolicy: { policy: "cross-origin" } }));
   app.use(cors({ origin: [env.frontendOrigin], credentials: true, methods: ["GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"] }));
   app.use(compression());
 
