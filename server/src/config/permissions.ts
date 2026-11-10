@@ -124,7 +124,7 @@ const roleMatrix: Record<UserRole, Permission[]> = {
     "invoice:read", "payment:read", "claim:read", "payment_plan:read",
     "report:billing", "report:clinical", "dashboard:admin", "dashboard:doctor",
     "dashboard:nurse", "dashboard:reception", "dashboard:patient", "dashboard:pharmacy", "dashboard:lab",
-    "dashboard:billing", "user:read", "user:create", "user:deactivate", "settings:read",
+    "dashboard:billing", "user:read", "user:create", "user:role", "user:deactivate", "settings:read",
     "settings:write",
     "reference:read", "reference:write", "audit:read", "audit:export",
   ],
@@ -216,7 +216,7 @@ export const NAV: Record<UserRole, string[]> = {
   ],
   ADMIN: [
     "dashboard", "doctors", "patients", "departments", "appointments", "rooms-beds",
-    "reports", "system-logs", "settings", "messages",
+    "reports", "system-logs", "settings", "users", "messages",
   ],
   DOCTOR: ["dashboard", "appointments", "patients", "prescriptions", "lab-orders", "emr", "schedule", "analytics", "messages", "settings"],
   NURSE: ["dashboard", "patients", "vitals", "medications", "notes", "ward", "messages", "settings"],

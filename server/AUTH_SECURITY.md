@@ -1,255 +1,280 @@
-# Authentication & Security Upgrade (2026-11-09)
+# Authentication & Security (updated 2026-11-10)
 
-Password + optional TOTP + mandatory daily email secret code + hospital-ID Room
-verification, enforced on the server. The existing UI, layouts, colours,
-typography, spacing, animations, dashboards, React Router structure and database
-conventions were kept; only the auth flow gained screens.
+The Daily Access Code is a **staff Room Access verification**, not a registration
+code, password, or account-verification OTP. Four mechanisms are kept separate:
 
----
+| Mechanism | Purpose | Who |
+| --- | --- | --- |
+| `EMAIL_VERIFICATION` | Prove control of the registered email after sign-up or invitation acceptance | New patients and invited staff |
+| `DAILY_ROOM_ACCESS` | Prove control of a registered hospital email before the staff login form opens | DOCTOR, NURSE, RECEPTION, PHARMACY, LABORATORY, BILLING |
+| `PATIENT_LOGIN` | Second step of a returning patient sign-in | PATIENT |
+| `ADMIN_2FA` | Optional authenticator second factor | ADMIN, SUPER_ADMIN (only when enabled) |
 
-## 1. Features implemented
-
-**Sign-in order (fixed, server-enforced)**
-`password → TOTP (if enabled) → today's email code → hospital ID (staff, Room) → role dashboard`
-
-The gate lives in `src/middleware/authenticate.ts`. Any protected request from a
-session that has not finished a stage returns `403` with
-`error.details.reason` = `TOTP_REQUIRED` | `DAILY_CODE_REQUIRED` |
-`STAFF_ID_REQUIRED`. The client cannot skip a stage by navigating directly, and
-`GET /me` (role, nav, permissions) stays closed until `READY`.
-
-**Password layer** — reused better-auth (`/api/v1/auth/*`), unchanged tables.
-
-**Public registration** — `POST /auth/sign-up/email` creates `PATIENT` only.
-`role` and `status` are `input: false` additional fields and default to
-`PATIENT`/`ACTIVE` in the schema.
-
-**Staff provisioning** — no self-registration. An administrator with
-`user:create` invites a staff member (`POST /users/invite`). The account is
-created as `INVITED` with the role and hospital ID from the invitation; a
-single-use token (SHA-256 digest at rest, 72 h TTL) is emailed as
-`/activate-account?token=…`. Acceptance sets the password through better-auth's
-own hasher and flips the account to `ACTIVE`. Re-use, expiry and revocation are
-refused. Roles an inviter may grant: `SUPER_ADMIN` → ADMIN/DOCTOR/NURSE/
-RECEPTION/PHARMACY/LABORATORY/BILLING; `ADMIN` → the same minus ADMIN. Neither
-can create a SUPER_ADMIN, and a patient cannot invite at all.
-
-**Optional TOTP 2FA** — enrollment (`POST /account/totp/enroll`) returns an
-`otpauth://` URI and the base32 secret once. Settings → Security renders that
-URI as a scannable QR code (`qrcode.react`, `QRCodeSVG`) with the base32 key as
-a manual fallback; the secret is stored AES-256-GCM-encrypted
-(`FIELD_ENCRYPTION_KEY`). Confirmation requires a valid
-6-digit code and returns ten single-use recovery codes stored only as Argon2id
-digests. Challenge verification is bound to the session row
-(`session.mfa_verified_at`), so a password-only session never reaches a
-dashboard. Five wrong codes lock the factor for 15 minutes.
-
-**Mandatory daily email secret code** — 14 CSPRNG characters from an alphabet
-without ambiguous glyphs (A–Z minus I/O, 2–9, configurable 12–16). One row per
-user per hospital-local day (unique index), Argon2id digest only, single use via
-a conditional `consumed_at IS NULL` update, 5 attempts, 24 h expiry, resend
-limited, delivery status (`PENDING`/`SENT`/`FAILED`) and attempts recorded. The
-plaintext is emailed once, never returned by an endpoint, never logged, and
-redacted in the mail outbox.
-
-**Hospital-ID Room verification** — separate from the daily code. The Room Page
-(`/room`) shows the hospital-ID form for a signed-in staff account whose badge
-is not yet verified. The value must match the authenticated account's
-`user.hospital_id` (constant-time compare); it never grants access on its own,
-and the gate keeps every staff API closed until it matches when an ID is on
-file. Mismatches are audited.
-
-**Administration UI** — `administration/users` lists staff, pending invitations
-(resend/revoke), suspend/reactivate accounts, and can trigger the daily-code
-batch manually.
+ADMIN, SUPER_ADMIN and PATIENT never receive a Daily Access Code.
 
 ---
 
-## 2. Files
+## 1. Flows
 
-**New (server)**
-| File | Purpose |
-| --- | --- |
-| `src/db/schema/security.ts` | `daily_verification_code`, `staff_invitation`, `job_lock`, `email_outbox` |
-| `src/lib/secrets.ts` | CSPRNG code generation, Argon2id hash/verify, recovery codes |
-| `src/lib/totp.ts` | TOTP/otpauth helpers over the encrypted secret |
-| `src/services/email.service.ts` | SMTP / Resend / stub transport + delivery log |
-| `src/services/daily-verification.service.ts` | Issue, verify (atomic), resend, batch dispatch |
-| `src/services/two-factor.service.ts` | Enrollment, challenge, recovery codes, disable |
-| `src/services/auth-progress.service.ts` | Stage evaluator + 403 reasons |
-| `src/services/staff-invitation.service.ts` | Invite, resend, revoke, accept, status changes |
-| `src/services/scheduler.service.ts` | DB-leased backend scheduler |
-| `src/routes/account.routes.ts` | Account status, challenges, TOTP, hospital ID |
-| `src/routes/users.routes.ts` | Staff directory, invitations, status, manual batch |
-| `src/routes/invitations.routes.ts` | Public invitation preview + acceptance |
-| `db/migrations/2026-11-09_auth_security.sql` | Migration for all of the above |
-| `AUTH_SECURITY.md` | This document |
+### New patient
 
-**Modified (server)**
-`src/db/schema/identity.ts` (hospital ID, Room timestamp, session MFA columns,
-2FA comment), `src/db/schema/enums.ts` (`DAILY_CODE` mail purpose),
-`src/db/schema/index.ts`, `src/lib/auth.ts` (custom 2FA instead of the plaintext
-plugin), `src/middleware/authenticate.ts` (gates + session MFA state),
-`src/config/env.ts`, `src/app.ts`, `src/server.ts`, `env.example`.
+`Register → EMAIL_VERIFICATION OTP → profile completion → patient dashboard`
 
-**New (client)**
-`routes/login-verify.tsx` (TOTP + daily code), `routes/activate-account.tsx`,
-`routes/protected/administration/UsersPage.tsx`.
+- Public sign-up creates a `PATIENT` only; `role` is `input: false`.
+- A session is created so the verification screen can work, but every dashboard
+  route returns `403` with `reason: EMAIL_VERIFICATION_REQUIRED` until the code
+  is verified.
+- After verification the account is held at `ONBOARDING_REQUIRED` until the
+  mandatory profile form is submitted (`hms.patient` row + MRN).
 
-**Modified (client)**
-`routes/login.tsx` (password → verify), `routes/register.tsx` (patient
-registration form), `routes/room.tsx` (hospital-ID form), `routes.ts` (three
-routes), `routes/protected/layout.tsx` (403 → verify screen),
-`components/globals/settings-view.tsx` (2FA card + QR), `services/api/endpoints.ts`,
-`services/auth/auth.api.ts`, `hooks/auth/use-session.ts`,
-`types/api.types.ts`.
+### New staff
+
+`Administrator invitation → accept link + password → EMAIL_VERIFICATION OTP → profile completion → role dashboard`
+
+- Staff cannot self-register.
+- The invitation fixes the role and hospital ID; acceptance never accepts a role
+  from the request body.
+- Acceptance sets `emailVerified = false`, clears onboarding, and issues an
+  `EMAIL_VERIFICATION` code.
+- First-time staff may sign in without Room Access **only** while email
+  verification or onboarding is outstanding. The dashboard remains gated by the
+  progress service.
+
+### Returning staff
+
+`Room Access page → click verification card → hospital email → DAILY_ROOM_ACCESS OTP → role-specific login form → normal password → role dashboard`
+
+- The Room Access page is `/room`. It shows the hospital verification banner and
+  a clickable “Verify Your Hospital Identity” card. The email form opens only
+  after the card is clicked.
+- `POST /room-access/send` returns the same message for every address, so it does
+  not disclose whether an account exists, its role, or its status.
+- A successful code creates a short-lived, httpOnly Room Access authorization.
+  It is **not** a better-auth session and cannot call protected endpoints.
+- The role shown on the login form comes from the server-side authorization, not
+  `?role=`. A valid doctor authorization cannot sign in a nurse account.
+- The normal password is still required. The authorization is consumed atomically
+  when the staff session is created; a token issued to another account or role is
+  refused. Expired authorizations are refused.
+
+### Returning patient
+
+`Patient login → email + password → PATIENT_LOGIN OTP → patient dashboard`
+
+Patients never see the Room Access page or receive a Daily Access Code.
+
+### Administrator
+
+`Normal login → email + password → READY (2FA disabled) | TOTP challenge (2FA enabled) → dashboard`
+
+- 2FA is optional and managed from account security settings.
+- Enrollment and management are restricted to ADMIN/SUPER_ADMIN.
+- A password-only session cannot reach a dashboard while TOTP is enabled.
+- Disabling or regenerating recovery codes requires the current password from a
+  session that already cleared 2FA.
+- TOTP secrets are AES-256-GCM encrypted; recovery codes are Argon2id digests and
+  single use.
 
 ---
 
-## 3. Migration
+## 2. Server authority
 
-`server/db/migrations/2026-11-09_auth_security.sql`:
+`src/services/auth-progress.service.ts` is the single source of truth for the
+remaining signed-in work:
 
-- `hms.user`: `hospital_id text` (+ unique index), `room_verified_at timestamptz`
-- `hms.session`: `mfa_verified_at timestamptz`, `mfa_method text`
-- `hms.email_purpose`: new value `DAILY_CODE` (outside the transaction)
-- `hms.daily_verification_code` + unique `(user_id, verification_date)`
-- `hms.staff_invitation` + unique `token_hash`, index on `lower(email)`
-- `hms.job_lock`
+`EMAIL_VERIFICATION → ONBOARDING → TOTP → PATIENT_OTP → READY`
+
+`src/middleware/authenticate.ts` enforces it on every protected request and
+returns `403` with a stable `error.details.reason`:
+`EMAIL_VERIFICATION_REQUIRED`, `ONBOARDING_REQUIRED`, `TOTP_REQUIRED`, or
+`PATIENT_OTP_REQUIRED`. `GET /me` and every dashboard endpoint stay closed until
+`READY`.
+
+The Room Access pre-login gate lives in the better-auth
+`databaseHooks.session.create.before` hook in `src/lib/auth.ts`. It applies to
+staff whose email is verified and whose onboarding is complete. It consumes the
+Room Access authorization and clears its cookie.
+
+---
+
+## 3. Data model and migrations
+
+- `hms.otp_code` — purpose-scoped codes: CSPRNG generation, Argon2id digest only,
+  expiry, attempt counter, max attempts, single-use `consumed_at`, delivery
+  status, created/sent timestamps.
+- `hms.room_access_session` — SHA-256 digest of the random cookie token, user,
+  server-side role, expiry, consumption.
+- `hms.user.email_verified_at`, `hms.user.onboarding_completed_at`.
+- `hms.otp_purpose` enum: `EMAIL_VERIFICATION`, `DAILY_ROOM_ACCESS`,
+  `PATIENT_LOGIN`, `ADMIN_2FA`.
+- `hms.email_purpose` gained the matching mail purposes.
+- The legacy `hms.daily_verification_code` table is retained for existing data
+  but no authentication path reads it.
+
+Migrations (Drizzle, schema `hms`):
+
+1. `drizzle/0000_bright_maggott.sql` — baseline.
+2. `drizzle/0001_silky_lady_vermin.sql` — OTP/Room Access tables, enums, user
+   verification/onboarding columns, backfills for existing accounts.
+3. `drizzle/0002_patient_mrn_sequence.sql` — creates the missing
+   `hms.patient_mrn_seq` used by patient onboarding and records its position after
+   any existing MRNs.
 
 Apply:
 
 ```bash
-psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f db/migrations/2026-11-09_auth_security.sql
+cd server
+npm run db:migrate
 ```
 
-Review the current Neon schema against the Drizzle schema before applying any migration. No
-migration is applied automatically at application startup.
+All three migrations have been applied to the configured Neon database. The
+migration preserves existing users, sessions, invitations and patient data.
 
 ---
 
 ## 4. Endpoints
 
-**Reused (unchanged)**
-`POST /api/v1/auth/sign-up/email`, `/auth/sign-in/email`, `/auth/sign-out`,
-`/auth/get-session`, `/auth/change-password` (better-auth), `GET /api/v1/me`
-(role, nav, permissions, scoping ids), the permission matrix in
-`config/permissions.ts`, `writeAudit`/`writePhiAccess`, `hms.email_outbox`, and
-the `{ data, meta }` envelope.
+Public / pre-login:
 
-**Implemented**
-| Method | Path | Access |
+| Method | Path | Notes |
 | --- | --- | --- |
-| GET | `/account/status` | any session (challenge stage) |
-| POST | `/account/verification/daily-code/verify` | session, TOTP cleared |
-| POST | `/account/verification/daily-code/resend` | session, TOTP cleared |
-| POST | `/account/verification/totp` | session |
-| POST | `/account/verification/recovery-code` | session |
-| POST | `/account/totp/enroll` | fully verified session |
-| POST | `/account/totp/enroll/confirm` | fully verified session |
-| POST | `/account/totp/disable` | fully verified session + password |
-| POST | `/account/totp/recovery-codes` | fully verified session + password |
-| GET | `/account/staff-id` | staff session |
-| POST | `/account/staff-id/verify` | staff session |
-| GET | `/users` | `user:read` |
-| GET | `/users/roles` | `user:read` |
-| GET | `/users/invitations` | `user:read` |
-| POST | `/users/invite` | `user:create` |
-| POST | `/users/invitations/:id/resend` | `user:create` |
-| DELETE | `/users/invitations/:id` | `user:create` |
-| PATCH | `/users/:id/status` | `user:deactivate` |
-| POST | `/users/daily-codes/dispatch` | `settings:write` |
-| GET | `/invitations/:token` | public |
-| POST | `/invitations/accept` | public |
+| POST | `/api/v1/auth/sign-up/email` | better-auth; creates PATIENT, issues email OTP |
+| POST | `/api/v1/auth/sign-in/email` | better-auth; staff gate + progress gate |
+| POST | `/api/v1/room-access/send` | public, generic response, eligible active verified staff only |
+| POST | `/api/v1/room-access/verify` | public, issues Room Access cookie and role login path |
+| GET | `/api/v1/room-access/session` | reads active Room Access authorization |
+| DELETE | `/api/v1/room-access/session` | revokes authorization/cookie |
+| GET | `/api/v1/invitations/:token` | invitation preview |
+| POST | `/api/v1/invitations/accept` | single-use acceptance |
 
-`GET /me` is unchanged and remains the only source of nav/permissions.
+Session / onboarding:
 
----
-
-## 5. Scheduling
-
-- Backend-only: `startAuthScheduler()` runs in the API process (no browser timers).
-- First tick runs immediately on boot (catch-up after restart), then every
-  `AUTH_SCHEDULER_INTERVAL_MS` (default 60 s).
-- Work is only done once the hospital-local hour is at least
-  `DAILY_CODE_SEND_HOUR` (default 06:00 in `CLINIC_TIMEZONE`); a manual run
-  (`POST /users/daily-codes/dispatch`) overrides the hour.
-- Concurrency: `acquireJobLock()` takes a `hms.job_lock` lease
-  (`AUTH_JOB_LOCK_SECONDS`, default 120 s) with a conditional upsert, so only one
-  replica sends. The lock row records `last_run_at`, `last_status`, `last_detail`.
-- Durability/idempotency: `daily_code_user_date_uq` makes a re-run a no-op, so a
-  crash mid-batch finishes the missing recipients on the next tick. Failed
-  deliveries are retried up to `DAILY_CODE_RESEND_MAX + 2` attempts.
-- A code is also issued on demand by `GET /account/status` (idempotent), so a
-  sign-in before the send hour still receives mail.
-- Disable with `AUTH_SCHEDULER_ENABLED=false` (e.g. worker-only deployments).
-
----
-
-## 6. Environment variables
-
-| Variable | Default | Notes |
+| Method | Path | Notes |
 | --- | --- | --- |
-| `EMAIL_PROVIDER` | `stub` | `smtp` or `resend` in real environments |
-| `SMTP_HOST/PORT/SECURE/USER/PASS`, `MAIL_FROM` | — | required for `smtp` |
-| `RESEND_API_KEY` | — | required for `resend` |
-| `FIELD_ENCRYPTION_KEY` | — | base64 32 bytes; **required in production** (TOTP secret) |
-| `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, `FRONTEND_ORIGIN` | dev defaults | production requires a real secret |
-| `CLINIC_TIMEZONE` | `America/New_York` | drives the daily period |
-| `DAILY_CODE_LENGTH` | `14` | clamped 12–16 |
-| `DAILY_CODE_TTL_MINUTES` | `1440` | expiry |
-| `DAILY_CODE_MAX_ATTEMPTS` | `5` | per issued code |
-| `DAILY_CODE_SEND_HOUR` | `6` | hospital-local hour |
-| `DAILY_CODE_RESEND_MAX` | `3` | additional sends per day |
-| `AUTH_SCHEDULER_ENABLED` | `true` | |
-| `AUTH_SCHEDULER_INTERVAL_MS` | `60000` | |
-| `AUTH_JOB_LOCK_SECONDS` | `120` | lease length |
-| `INVITATION_TTL_HOURS` | `72` | |
-| `TOTP_ISSUER` | `HOSPITAL_NAME` | authenticator label |
-| `TOTP_WINDOW` | `1` | ±30 s drift |
-| `TOTP_MAX_ATTEMPTS` / `TOTP_LOCK_MINUTES` | `5` / `15` | lockout |
-| `TOTP_RECOVERY_CODE_COUNT` | `10` | |
+| GET | `/api/v1/account/status` | current stage; issues pending email/patient code when allowed |
+| POST | `/api/v1/account/verification/email` | `EMAIL_VERIFICATION` only |
+| POST | `/api/v1/account/verification/email/resend` | cooldown/rate limited |
+| POST | `/api/v1/account/verification/patient-otp` | `PATIENT_LOGIN` only |
+| POST | `/api/v1/account/verification/patient-otp/resend` | cooldown/rate limited |
+| POST | `/api/v1/account/verification/totp` | ADMIN 2FA |
+| POST | `/api/v1/account/verification/recovery-code` | ADMIN recovery |
+| POST | `/api/v1/account/totp/enroll` / `confirm` | admins only |
+| POST | `/api/v1/account/totp/disable` | admins only, password confirmation |
+| POST | `/api/v1/account/totp/recovery-codes` | admins only, password confirmation |
+| GET/POST | `/api/v1/account/onboarding` | profile data / completion |
+| POST | `/api/v1/account/onboarding/avatar` | optional profile image |
+| POST | `/api/v1/account/patient-registration` | saves the five-step registration profile before verification |
+| GET/PUT | `/api/v1/account/patient-profile/draft` | cross-device wizard draft; no patient record, cleared on completion |
+| POST/GET/DELETE | `/api/v1/account/documents[/:id]` | private medical documents during registration/completion |
+
+Administrator routes under `/api/v1/users` (all permission-checked server side):
+
+| Method | Path | Notes |
+| --- | --- | --- |
+| GET | `/api/v1/users` | search, role/status/department/verification filters, sorting, pagination |
+| GET | `/api/v1/users/statistics` | live totals, statuses, role counts, pending invitations |
+| GET | `/api/v1/users/:id` | account, department, patient and invitation detail |
+| POST | `/api/v1/users` / `/api/v1/users/invite` | create or invite staff/patient (invitation-backed) |
+| PATCH | `/api/v1/users/:id` | name, phone, hospital ID, department, specialty, title |
+| PATCH | `/api/v1/users/:id/role` | guarded role change; revokes sessions and resets onboarding |
+| PATCH | `/api/v1/users/:id/status` | suspend/reactivate; revokes sessions and pending invitations |
+| GET/POST/DELETE | `/api/v1/users/invitations[/:id[/resend]]` | list, resend and revoke single-use invitations |
+
+Role login paths returned by Room Access:
+
+| Role | Path |
+| --- | --- |
+| DOCTOR | `/login?role=doctor` |
+| NURSE | `/login?role=nurse` |
+| RECEPTION | `/login?role=reception` |
+| PHARMACY | `/login?role=pharmacy` |
+| LABORATORY | `/login?role=lab` |
+| BILLING | `/login?role=billing` |
 
 ---
 
-## 7. Security measures
+## 5. Frontend routes
 
-- Argon2id (`m=19456, t=2, p=1`) for daily codes and recovery codes; AES-256-GCM
-  for the TOTP secret; SHA-256 only for high-entropy invitation tokens.
-- Daily code: never returned, never logged, redacted from `email_outbox`, single
-  use enforced atomically, attempt-limited, expiring, resend-limited.
-- Invitation: single use atomically, expiring, revocable, one active token per
-  address (older ones revoked), token never stored in plaintext, role and hospital
-  ID fixed by the invitation row.
-- TOTP: failed-attempt counter + timed lock, single-use recovery codes removed on
-  use, password re-checked before disabling/regenerating.
-- Gates enforced in middleware, not in the client; responses carry stable reason
-  codes. Every challenge and administrative action is audited.
-- Suspension/deactivation revokes all sessions; self-status changes are blocked;
-  SUPER_ADMIN accounts are protected from ADMIN edits.
-- Hospital ID uses a constant-time comparison, is validated only against the
-  authenticated account, and is audited on mismatch.
-- HTTP rate limiting: global limiter plus 12 attempts / 15 min per account on
-  `/account/*` (IP fallback via `ipKeyGenerator`).
-- Better-auth `Origin` validation and httpOnly session cookies remain in force.
+- `/register` — five-step patient sign-up; lands on `/verify-email`.
+- `/login` — role-aware sign-in. Staff portals require an active Room Access
+  authorization; administrators and patients do not. A tampered `?role=` is
+  corrected from the server-stored Room Access role.
+- `/room` — hospital verification banner, clickable card, email form, code form,
+  expiry/error states, resend countdown, automatic role redirect.
+- `/verify-email` — email verification (`/login/verify` remains the challenge hub for TOTP and patient OTP).
+- `/patient/complete-profile` — mandatory five-step patient profile wizard (`/complete-profile` also serves staff onboarding).
+- `/accept-invitation` — invitation acceptance (the legacy `/activate-account` URL still works); signs in and continues to email
+  verification.
+- Protected layout sends `ONBOARDING_REQUIRED` to `/complete-profile` and other
+  outstanding stages to `/login/verify`; patients are routed to
+  `/patient/complete-profile` once their email is verified.
+- `/administration/users` — Admin User Management (statistics, table, create/invite,
+  view/edit, department, role, suspend/reactivate, invitation lifecycle).
 
 ---
 
-## 8. Remaining dependencies / known limitations
+## 6. Security properties
 
-1. **Migration not applied to the configured database.** `.env` points at Neon;
-   only the local dev database was migrated. Run the SQL before deploying.
-2. **Email credentials.** `EMAIL_PROVIDER=stub` writes redacted outbox rows and
-   delivers nothing. Set `smtp`/`resend` + credentials for real delivery.
-3. **Sessions issued before deploy** have `mfa_verified_at = NULL`. Users without
-   TOTP are unaffected; users with TOTP must clear the challenge once.
-5. **Frontend checks are type/build only** — no browser click-through was run.
-6. Existing seeded staff have no `hospital_id`, so the Room form is optional for
-   them until an ID is assigned through an invitation or admin update.
+- Passwords remain better-auth credentials; no custom password storage.
+- OTPs are CSPRNG-generated, Argon2id-hashed, purpose-bound, expiring,
+  attempt-limited, resend-cooldown and hourly-limited, and single-use.
+- Purpose is part of every OTP query, so an email-verification code cannot satisfy
+  patient login or Room Access.
+- Codes and invitation links are redacted from `hms.email_outbox` and never
+  returned by the API or written to logs.
+- Room Access codes are sent only to active, verified accounts in the six staff
+  roles. The public response never reveals account existence, role or status.
+- Room Access authorization is httpOnly, SameSite=Lax, Secure in production,
+  short-lived, hashed at rest, one active authorization per account, and consumed
+  on password sign-in.
+- Staff roles always come from `hms.user` / `hms.room_access_session`, never from
+  request parameters.
+- Account status is checked when sending and verifying codes, creating sessions,
+  reading Room Access authorizations, and consuming them.
+- Admin 2FA is bound to `session.mfa_verified_at`; failed TOTP does not make the
+  session READY.
+- Better-auth `Origin` validation and httpOnly session cookies remain in place.
+- Authentication events are audited (`auth.*`, `identity.*`).
 
 ---
 
-## 9. Verification status
+## 7. Environment
 
-Database-mutating smoke fixtures have been removed. The existing automated tests can be run with
-`npm test`; review the current Neon schema and the proposed migration before any database change.
+Purpose-scoped OTP settings:
+
+| Variable | Default |
+| --- | --- |
+| `OTP_TTL_MINUTES` | 15 (Room Access) |
+| `EMAIL_VERIFICATION_TTL_MINUTES` | 60 |
+| `PATIENT_LOGIN_TTL_MINUTES` | 10 |
+| `ROOM_ACCESS_SESSION_TTL_MINUTES` | 10 |
+| `OTP_MAX_ATTEMPTS` | 5 |
+| `OTP_RESEND_COOLDOWN_SECONDS` | 45 |
+| `INVITATION_TTL_HOURS` | 24 (never longer than 24 hours) |
+
+Legacy `DAILY_CODE_*` and `AUTH_SCHEDULER_*` variables are still accepted so
+existing deployments boot, but they no longer affect sign-in. No scheduler runs.
+
+Mail: `EMAIL_PROVIDER` = `smtp` or `resend`; SMTP or Resend credentials and
+`MAIL_FROM` are required for real delivery. `FIELD_ENCRYPTION_KEY` is required in
+production for the TOTP secret.
+
+---
+
+## 8. Verification performed
+
+- Server and client TypeScript checks pass.
+- Neon migrations `0001` and `0002` applied successfully; sequence and new tables
+  verified.
+- 105 API checks passed against Neon through the running API, covering:
+  patient registration/email OTP/onboarding, patient login OTP (wrong, expired,
+  resend, valid, cross-purpose rejection), all six staff Room Access roles,
+  role-specific redirects, no-session-without-password, cross-role refusal,
+  used/expired code refusal, suspended/unverified/admin exclusion, admin 2FA
+  disabled/enabled/wrong/valid/disable, SUPER_ADMIN login, and authorization
+  boundaries.
+- A separate 10-check staff invitation test passed: invite delivery, preview,
+  acceptance, first-time sign-in without Room Access, email verification,
+  onboarding, returning-staff Room Access requirement, and final dashboard.
+- Temporary test users and patient rows were removed. The configured SMTP
+  transport accepted a real delivery check to the hospital mailbox.

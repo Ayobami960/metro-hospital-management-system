@@ -11,8 +11,11 @@ export default [
   route("login", "routes/login.tsx"),
   route("register", "routes/register.tsx"),
   route("login/verify", "routes/login-verify.tsx"),
+  route("verify-email", "routes/verify-email.tsx"),
   route("complete-profile", "routes/complete-profile.tsx"),
+  route("patient/complete-profile", "routes/patient-complete-profile.tsx"),
   route("activate-account", "routes/activate-account.tsx"),
+  route("accept-invitation", "routes/accept-invitation.tsx"),
 
   layout("routes/protected/layout.tsx", [
     // Administration

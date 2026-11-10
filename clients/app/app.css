@@ -280,8 +280,16 @@ body {
     transition: background 0.3s, border-color 0.3s, color 0.3s, box-shadow 0.3s, transform 0.3s;
   }
   .btn:hover { background: var(--blue); border-color: var(--blue); color: #fff; box-shadow: 0 14px 30px -12px color-mix(in srgb, var(--blue) 70%, transparent); transform: translateY(-2px); }
-  .btn.o { background: transparent; color: var(--ink); }
-  .btn.o:hover { color: #fff; }
+  .btn.o {
+  background: transparent;
+  color: var(--ink);
+  border: 1.5px solid var(--ink);
+}
+.btn.o:hover {
+  background: var(--blue);
+  border-color: var(--blue);
+  color: #fff;
+}
   .btn svg { width: 17px; height: 17px; }
   :where(a, button, [tabindex]):focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; border-radius: 6px; }
 

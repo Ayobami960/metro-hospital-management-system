@@ -50,6 +50,9 @@ export interface PagedRows<T> {
 const departmentStatus = (occupancyPercent: number): "Operational" | "High Volume" | "Under Maintenance" =>
   occupancyPercent >= 85 ? "High Volume" : "Operational";
 
+const departmentIdRef = sql`${sql.identifier("hms")}.${sql.identifier("department")}.${sql.identifier("id")}`;
+const departmentHeadDoctorIdRef = sql`${sql.identifier("hms")}.${sql.identifier("department")}.${sql.identifier("head_doctor_id")}`;
+
 const departmentSelection = {
   id: departments.id,
   name: departments.name,
@@ -60,28 +63,28 @@ const departmentSelection = {
   headDoctorId: departments.headDoctorId,
   head: sql<string | null>`(
     select u.name from hms.doctor d join hms."user" u on u.id = d.user_id
-    where d.id = ${departments.headDoctorId}
+    where d.id = ${departmentHeadDoctorIdRef}
   )`,
   staffCount: sql<number>`(
-    select count(*)::int from hms.doctor d where d.department_id = ${departments.id}
+    select count(*)::int from hms.doctor d where d.department_id = ${departmentIdRef}
   )`,
   bedCount: sql<number>`(
     select count(*)::int from hms.bed b
     join hms.room r on r.id = b.room_id
-    where r.department_id = ${departments.id}
+    where r.department_id = ${departmentIdRef}
   )`,
   bedsOccupied: sql<number>`(
     select count(*)::int from hms.bed b
     join hms.room r on r.id = b.room_id
-    where r.department_id = ${departments.id} and b.status = 'OCCUPIED'
+    where r.department_id = ${departmentIdRef} and b.status = 'OCCUPIED'
   )`,
   bedsMaintenance: sql<number>`(
     select count(*)::int from hms.bed b
     join hms.room r on r.id = b.room_id
-    where r.department_id = ${departments.id} and b.status = 'MAINTENANCE'
+    where r.department_id = ${departmentIdRef} and b.status = 'MAINTENANCE'
   )`,
   roomsCount: sql<number>`(
-    select count(*)::int from hms.room r where r.department_id = ${departments.id}
+    select count(*)::int from hms.room r where r.department_id = ${departmentIdRef}
   )`,
   createdAt: departments.createdAt,
 };

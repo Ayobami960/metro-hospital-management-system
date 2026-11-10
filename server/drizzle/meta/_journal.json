@@ -15,6 +15,41 @@
       "when": 1794292736710,
       "tag": "0001_silky_lady_vermin",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1794295000000,
+      "tag": "0002_patient_mrn_sequence",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1794299000000,
+      "tag": "0003_patient_registration_fields",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1794300342101,
+      "tag": "0004_yellow_preak",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1794301068335,
+      "tag": "0005_organic_zemo",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1794301720000,
+      "tag": "0006_patient_mrn_sequence_repair",
+      "breakpoints": true
     }
   ]
 }

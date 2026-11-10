@@ -14,7 +14,12 @@ import { writeAudit } from "../lib/audit.js";
 import { isAdminRole } from "../lib/roles.js";
 import { enforceProgress, evaluateProgress } from "../services/auth-progress.service.js";
 import { issueOtp, maskEmail, verifyOtp } from "../services/otp.service.js";
-import { getOnboarding, completeOnboarding } from "../services/onboarding.service.js";
+import {
+  getOnboarding,
+  completeOnboarding,
+  savePatientDraft,
+  savePatientRegistration,
+} from "../services/onboarding.service.js";
 import {
   confirmEnrollment,
   disableTotp,
@@ -23,7 +28,12 @@ import {
   startEnrollment,
   verifySecondFactor,
 } from "../services/two-factor.service.js";
-import { uploadAvatar } from "../services/files.service.js";
+import {
+  deleteFile,
+  listOwnOnboardingDocuments,
+  uploadAvatar,
+  uploadPatientOnboardingDocument,
+} from "../services/files.service.js";
 
 /**
  * Account endpoints reachable while a session is still mid-challenge. They are
@@ -35,6 +45,16 @@ export const accountRouter = Router();
 const verificationLimiter = rateLimit({
   windowMs: 15 * 60_000,
   max: 20,
+  standardHeaders: "draft-7",
+  legacyHeaders: false,
+  skip: () => env.isTest,
+  keyGenerator: (req) => req.actor?.id ?? ipKeyGenerator(req.ip ?? "0.0.0.0"),
+});
+
+// Wizard autosaves on each Continue; allow more headroom than a code check.
+const draftLimiter = rateLimit({
+  windowMs: 15 * 60_000,
+  max: 60,
   standardHeaders: "draft-7",
   legacyHeaders: false,
   skip: () => env.isTest,
@@ -447,37 +467,48 @@ accountRouter.get(
   }),
 );
 
+const patientProfileSchema = z.object({
+  firstName: z.string().trim().min(1).max(80),
+  lastName: z.string().trim().min(1).max(80),
+  middleName: z.string().trim().max(80).nullable().optional(),
+  dateOfBirth: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  gender: z.enum(["MALE", "FEMALE", "NON_BINARY", "PREFER_NOT_TO_SAY"]).optional(),
+  sexAtBirth: z.enum(["MALE", "FEMALE", "INTERSEX", "UNKNOWN"]).optional(),
+  bloodType: z
+    .enum(["A_POS", "A_NEG", "B_POS", "B_NEG", "AB_POS", "AB_NEG", "O_POS", "O_NEG", "UNKNOWN"])
+    .optional(),
+  phone: z.string().trim().min(7).max(32),
+  addressLine1: z.string().trim().min(3).max(200),
+  addressLine2: z.string().trim().max(200).nullable().optional(),
+  city: z.string().trim().min(1).max(80),
+  state: z.string().trim().min(1).max(80),
+  postalCode: z.string().trim().min(3).max(16),
+  emergencyContact: z
+    .object({
+      name: z.string().trim().min(1).max(120),
+      relationship: z.enum(["SPOUSE", "PARENT", "CHILD", "SIBLING", "GUARDIAN", "OTHER"]),
+      phone: z.string().trim().min(7).max(32),
+    })
+    .optional(),
+  allergies: z.array(z.string().trim().min(1).max(120)).max(50).optional(),
+  conditions: z.array(z.string().trim().min(1).max(200)).max(50).optional(),
+  insurance: z
+    .object({
+      providerName: z.string().trim().min(1).max(120),
+      planName: z.string().trim().max(120).nullable().optional(),
+      policyNumber: z.string().trim().min(1).max(80),
+      memberId: z.string().trim().max(80).nullable().optional(),
+      groupNumber: z.string().trim().max(80).nullable().optional(),
+    })
+    .optional(),
+  consents: z.object({ terms: z.boolean(), privacy: z.boolean(), hipaa: z.boolean() }),
+});
+
 const onboardingSchema = z.object({
   name: z.string().trim().min(2).max(120),
   phone: z.string().trim().min(7).max(32),
   image: z.string().max(2048).nullable().optional(),
-  patient: z
-    .object({
-      firstName: z.string().trim().min(1).max(80),
-      lastName: z.string().trim().min(1).max(80),
-      middleName: z.string().trim().max(80).nullable().optional(),
-      dateOfBirth: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
-      sexAtBirth: z.enum(["MALE", "FEMALE", "INTERSEX", "UNKNOWN"]),
-      bloodType: z
-        .enum([
-          "A_POS",
-          "A_NEG",
-          "B_POS",
-          "B_NEG",
-          "AB_POS",
-          "AB_NEG",
-          "O_POS",
-          "O_NEG",
-          "UNKNOWN",
-        ])
-        .optional(),
-      addressLine1: z.string().trim().min(3).max(200),
-      addressLine2: z.string().trim().max(200).nullable().optional(),
-      city: z.string().trim().min(1).max(80),
-      state: z.string().trim().min(1).max(80),
-      postalCode: z.string().trim().min(3).max(16),
-    })
-    .optional(),
+  patient: patientProfileSchema.optional(),
   staff: z
     .object({
       title: z.string().trim().min(2).max(120),
@@ -485,9 +516,90 @@ const onboardingSchema = z.object({
       employeeId: z.string().trim().max(40).nullable().optional(),
       ward: z.string().trim().max(80).nullable().optional(),
       departmentId: z.string().uuid().nullable().optional(),
+      specialtyId: z.string().uuid().nullable().optional(),
     })
     .optional(),
 });
+
+accountRouter.post(
+  "/account/patient-registration",
+  authenticate,
+  verificationLimiter,
+  validate({ body: z.object({ patient: patientProfileSchema }) }),
+  handle(async (req, res) => {
+    const actor = currentActor(req);
+    await savePatientRegistration(
+      actor.id,
+      (req.body as { patient: z.infer<typeof patientProfileSchema> }).patient,
+      req.ip,
+    );
+    ok(res, await getOnboarding(actor.id));
+  }),
+);
+
+const patientDraftSchema = z
+  .object({
+    step: z.number().int().min(0).max(4).optional(),
+    firstName: z.string().trim().max(80).optional(),
+    lastName: z.string().trim().max(80).optional(),
+    middleName: z.string().trim().max(80).optional(),
+    dateOfBirth: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+    gender: z.enum(["MALE", "FEMALE", "NON_BINARY", "PREFER_NOT_TO_SAY"]).optional(),
+    bloodType: z
+      .enum(["A_POS", "A_NEG", "B_POS", "B_NEG", "AB_POS", "AB_NEG", "O_POS", "O_NEG", "UNKNOWN"])
+      .optional(),
+    phone: z.string().trim().max(32).optional(),
+    addressLine1: z.string().trim().max(200).optional(),
+    addressLine2: z.string().trim().max(200).optional(),
+    city: z.string().trim().max(80).optional(),
+    state: z.string().trim().max(80).optional(),
+    postalCode: z.string().trim().max(16).optional(),
+    emergencyContact: z
+      .object({
+        name: z.string().trim().max(120).optional(),
+        relationship: z.enum(["SPOUSE", "PARENT", "CHILD", "SIBLING", "GUARDIAN", "OTHER"]).optional(),
+        phone: z.string().trim().max(32).optional(),
+      })
+      .optional(),
+    allergies: z.array(z.string().trim().min(1).max(120)).max(50).optional(),
+    conditions: z.array(z.string().trim().min(1).max(200)).max(50).optional(),
+    insurance: z
+      .object({
+        providerName: z.string().trim().max(120).optional(),
+        planName: z.string().trim().max(120).optional(),
+        policyNumber: z.string().trim().max(80).optional(),
+        memberId: z.string().trim().max(80).optional(),
+        groupNumber: z.string().trim().max(80).optional(),
+      })
+      .optional(),
+    consents: z
+      .object({ terms: z.boolean().optional(), privacy: z.boolean().optional(), hipaa: z.boolean().optional() })
+      .optional(),
+  })
+  .strict();
+
+accountRouter.get(
+  "/account/patient-profile/draft",
+  authenticate,
+  handle(async (req, res) => {
+    const onboarding = await getOnboarding(currentActor(req).id);
+    ok(res, { draft: onboarding.draft });
+  }),
+);
+
+accountRouter.put(
+  "/account/patient-profile/draft",
+  authenticate,
+  draftLimiter,
+  validate({ body: patientDraftSchema }),
+  handle(async (req, res) => {
+    const result = await savePatientDraft(
+      currentActor(req).id,
+      req.body as z.infer<typeof patientDraftSchema>,
+    );
+    ok(res, { saved: true, updatedAt: result.updatedAt });
+  }),
+);
 
 accountRouter.post(
   "/account/onboarding",
@@ -497,6 +609,41 @@ accountRouter.post(
     const actor = currentActor(req);
     await completeOnboarding(actor.id, req.body as z.infer<typeof onboardingSchema>, req.ip);
     ok(res, await getOnboarding(actor.id));
+  }),
+);
+
+/* Medical documents attached during registration and profile completion. */
+
+accountRouter.post(
+  "/account/documents",
+  authenticate,
+  parseMultipart,
+  handle(async (req, res) => {
+    const actor = currentActor(req);
+    if (!req.file) throw notFound("No document was uploaded.");
+    const record = await uploadPatientOnboardingDocument(
+      actor,
+      req.file.buffer,
+      req.file.originalname || "document",
+      req.ip,
+    );
+    ok(res, record);
+  }),
+);
+
+accountRouter.get(
+  "/account/documents",
+  authenticate,
+  handle(async (req, res) => {
+    ok(res, { documents: await listOwnOnboardingDocuments(currentActor(req)) });
+  }),
+);
+
+accountRouter.delete(
+  "/account/documents/:id",
+  authenticate,
+  handle(async (req, res) => {
+    ok(res, await deleteFile(currentActor(req), String(req.params.id), req.ip));
   }),
 );
 

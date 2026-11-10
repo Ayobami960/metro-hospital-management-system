@@ -9,7 +9,14 @@ import { toast } from "sonner";
 
 import { authApi } from "@/services/auth/auth.api";
 import { errorMessage } from "@/services/api/api-error";
-import type { StaffDirectoryParams } from "@/types/api.types";
+import type {
+  ManagedUserParams,
+  PatientDraft,
+  PatientProfileInput,
+  Role,
+  StaffDirectoryParams,
+  UpdateManagedUserInput,
+} from "@/types/api.types";
 
 export const sessionKeys = {
   me: ["session", "me"] as const,
@@ -22,6 +29,8 @@ export const accountKeys = {
   staff: ["account", "staff"] as const,
   invitations: ["account", "invitations"] as const,
   invitableRoles: ["account", "invitable-roles"] as const,
+  userStatistics: ["account", "user-statistics"] as const,
+  managedUser: (userId: string) => ["account", "managed-user", userId] as const,
 };
 
 /** Resolved session user (`GET /me`). 401/403 are terminal — do not retry. */
@@ -206,6 +215,35 @@ export function useUploadOnboardingAvatar() {
   return useMutation({ mutationFn: (file: File) => authApi.uploadOnboardingAvatar(file) });
 }
 
+/** Saves the registration profile without completing onboarding. */
+export function usePatientRegistration() {
+  return useMutation({ mutationFn: (patient: PatientProfileInput) => authApi.registerPatient(patient) });
+}
+
+export function useSavePatientDraft() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (draft: PatientDraft) => authApi.savePatientDraft(draft),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: accountKeys.onboarding }),
+  });
+}
+
+export function useUploadOnboardingDocument() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (file: File) => authApi.uploadOnboardingDocument(file),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: accountKeys.onboarding }),
+  });
+}
+
+export function useDeleteOnboardingDocument() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (fileId: string) => authApi.deleteOnboardingDocument(fileId),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: accountKeys.onboarding }),
+  });
+}
+
 /* Staff administration */
 
 export function useStaffAccounts(params: StaffDirectoryParams = {}) {
@@ -232,13 +270,73 @@ export function usePendingInvitations() {
   });
 }
 
+const invalidateUserManagement = (queryClient: QueryClient): void => {
+  void queryClient.invalidateQueries({ queryKey: accountKeys.staff });
+  void queryClient.invalidateQueries({ queryKey: accountKeys.invitations });
+  void queryClient.invalidateQueries({ queryKey: accountKeys.userStatistics });
+};
+
 export function useInviteStaff() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: authApi.inviteStaff,
+    onSuccess: () => invalidateUserManagement(queryClient),
+  });
+}
+
+/* Admin user management */
+
+export function useManagedUsers(params: ManagedUserParams = {}) {
+  return useQuery({
+    queryKey: [...accountKeys.staff, "managed", params],
+    queryFn: () => authApi.listManagedUsers(params),
+    staleTime: 15_000,
+  });
+}
+
+export function useUserStatistics() {
+  return useQuery({
+    queryKey: accountKeys.userStatistics,
+    queryFn: authApi.userStatistics,
+    staleTime: 30_000,
+  });
+}
+
+export function useManagedUser(userId: string | null) {
+  return useQuery({
+    queryKey: accountKeys.managedUser(userId ?? ""),
+    queryFn: () => authApi.managedUser(userId ?? ""),
+    enabled: Boolean(userId),
+    retry: false,
+  });
+}
+
+export function useCreateUser() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: authApi.createUser,
+    onSuccess: () => invalidateUserManagement(queryClient),
+  });
+}
+
+export function useUpdateManagedUser(userId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (input: UpdateManagedUserInput) => authApi.updateManagedUser(userId, input),
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: accountKeys.staff });
-      void queryClient.invalidateQueries({ queryKey: accountKeys.invitations });
+      invalidateUserManagement(queryClient);
+      void queryClient.invalidateQueries({ queryKey: accountKeys.managedUser(userId) });
+    },
+  });
+}
+
+export function useChangeUserRole(userId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (role: Role) => authApi.changeUserRole(userId, role),
+    onSuccess: () => {
+      invalidateUserManagement(queryClient);
+      void queryClient.invalidateQueries({ queryKey: accountKeys.managedUser(userId) });
     },
   });
 }
@@ -247,7 +345,10 @@ export function useResendInvitation() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (invitationId: string) => authApi.resendInvitation(invitationId),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: accountKeys.invitations }),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: accountKeys.invitations });
+      void queryClient.invalidateQueries({ queryKey: accountKeys.userStatistics });
+    },
   });
 }
 
@@ -255,7 +356,7 @@ export function useRevokeInvitation() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (invitationId: string) => authApi.revokeInvitation(invitationId),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: accountKeys.invitations }),
+    onSuccess: () => invalidateUserManagement(queryClient),
   });
 }
 
@@ -264,7 +365,7 @@ export function useSetStaffStatus() {
   return useMutation({
     mutationFn: (input: { userId: string; status: string }) =>
       authApi.setStaffStatus(input.userId, input.status),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: accountKeys.staff }),
+    onSuccess: () => invalidateUserManagement(queryClient),
   });
 }
 

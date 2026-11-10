@@ -61,7 +61,10 @@ export default function LoginVerify() {
     if (status.data.nextStep === "READY") {
       navigate(getRoleHomeRoute(status.data.user.role as roles), { replace: true });
     } else if (status.data.nextStep === "ONBOARDING") {
-      navigate("/complete-profile", { replace: true });
+      navigate(
+        status.data.user.role === "PATIENT" ? "/patient/complete-profile" : "/complete-profile",
+        { replace: true },
+      );
     }
   }, [status.data, navigate]);
 

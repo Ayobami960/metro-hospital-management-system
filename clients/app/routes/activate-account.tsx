@@ -60,7 +60,7 @@ export default function ActivateAccount() {
       // onboarding. No staff dashboard is reachable before both are done.
       await signIn.mutateAsync({ email: invitation.data.email, password });
       toast.success("Account activated. Verify your email to continue.");
-      navigate("/login/verify", { replace: true });
+      navigate("/verify-email", { replace: true });
     } catch (error) {
       toast.error(errorMessage(error, "Could not activate the account."));
     }
@@ -78,7 +78,7 @@ export default function ActivateAccount() {
         </Link>
 
         <h1 className="mt-6 text-2xl font-extrabold tracking-tight text-foreground">
-          Activate your staff account
+          Activate your MGH Hospital account
         </h1>
 
         {!token && (
@@ -171,7 +171,10 @@ export default function ActivateAccount() {
               <p className="flex items-start gap-2 text-xs leading-relaxed text-muted-foreground">
                 <CheckCircle2 size={14} className="mt-0.5 shrink-0 text-emerald-600" aria-hidden="true" />
                 This link works once. Next you will verify your registered email address and complete your
-                staff profile. The Daily Room Access Code is only used later, when you sign in to your room.
+                {invitation.data.role === "PATIENT" ? " patient profile" : " staff profile"}. 
+                {invitation.data.role === "PATIENT"
+                  ? "Patients sign in with email and password plus a one-time code."
+                  : "The Daily Room Access Code is only used later, when you sign in to your room."}
               </p>
             </form>
           </>

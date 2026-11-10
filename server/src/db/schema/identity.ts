@@ -116,7 +116,7 @@ export const twoFactor = hms.table("two_factor", {
   ...timestamps,
 });
 
-/** Staff directory extension for clinicians. */
+/** Staff directory extension for clinicians and administrative staff. */
 export const staffProfiles = hms.table(
   "staff_profile",
   {
@@ -125,7 +125,9 @@ export const staffProfiles = hms.table(
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
     title: text("title"),
+    /** FK is declared in the migration to avoid a schema circular import. */
     departmentId: uuid("department_id"),
+    /** FK is declared in the migration to avoid a schema circular import. */
     specialtyId: uuid("specialty_id"),
     licenseNumber: text("license_number"),
     employeeId: text("employee_id"),

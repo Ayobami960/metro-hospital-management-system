@@ -672,11 +672,11 @@ export const patientDashboard = async (patientId: string) => {
         status: labOrders.status,
         orderedAt: labOrders.orderedAt,
         releasedAt: labOrders.releasedAt,
-        critical: sql<boolean>`exists (select 1 from hms.lab_result lr where lr.patient_id = ${labOrders.patientId} and lr.critical and lr.released_at is not null)`,
+        critical: sql<boolean>`exists (select 1 from hms.lab_result lr where lr.patient_id = ${sql`${sql.identifier("hms")}.${sql.identifier("lab_order")}.${sql.identifier("patient_id")}`} and lr.critical and lr.released_at is not null)`,
         testNames: sql<string[]>`coalesce((
           select array_agg(t.name order by t.name)
           from hms.lab_order_item i join hms.lab_test t on t.id = i.test_id
-          where i.lab_order_id = ${labOrders.id}
+          where i.lab_order_id = ${sql`${sql.identifier("hms")}.${sql.identifier("lab_order")}.${sql.identifier("id")}`}
         ), '{}')`,
       })
       .from(labOrders)

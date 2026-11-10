@@ -15,9 +15,7 @@ import { HomeFooter } from "@/components/home/Footer";
 import { Navbar } from "@/components/home/Navbar";
 import { useReveal } from "@/hooks/use-motion";
 
-// import { useReveal } from "@/hooks/useReveal";
 
-// The WebGL scene (three.js) is code-split and loaded after first paint.
 const MedicalScienceScene = lazy(() => import("@/components/home/MedicalScienceScene").then((m) => ({ default: m.MedicalScienceScene })));
 
 export function meta({}: Route.MetaArgs) {

@@ -58,7 +58,7 @@ const schema = z.object({
   AUTH_SCHEDULER_ENABLED: bool.default(false),
   AUTH_SCHEDULER_INTERVAL_MS: int.min(10_000).default(60_000),
   AUTH_JOB_LOCK_SECONDS: int.min(30).default(120),
-  INVITATION_TTL_HOURS: int.positive().default(72),
+  INVITATION_TTL_HOURS: int.positive().default(24),
 
   /* Purpose-scoped OTPs (email verification, Room Access, patient login). */
   OTP_TTL_MINUTES: int.positive().default(15),

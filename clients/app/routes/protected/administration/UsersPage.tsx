@@ -1,232 +1,406 @@
 /**
- * Staff accounts and invitations (administrators).
+ * Admin → User Management.
  *
- * Staff never self-register: this screen creates the account, emails a
- * single-use invitation link, and can resend or revoke it.
+ * Central place to create/invite hospital users, see live database statistics,
+ * search/filter/sort accounts, and manage profile, department, role, status and
+ * invitation lifecycle. Every mutation is authorized again on the backend.
  */
 import { useState } from "react";
-import { CheckCircle2, Mail, Search, ShieldCheck, UserPlus, X } from "lucide-react";
+import {
+  ArrowUpDown,
+  Calendar,
+  CheckCircle2,
+  Eye,
+  Mail,
+  Search,
+  ShieldCheck,
+  UserPlus,
+  Users,
+  UserX,
+} from "lucide-react";
 import { toast } from "sonner";
 
+import { UserFormModal } from "@/components/administration/UserFormModal";
+import { UserDetailModal } from "@/components/administration/UserDetailModal";
 import { QueryError, QueryLoading } from "@/components/globals/query-state";
 import { ServerPager } from "@/components/globals/server-pager";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
-import { errorMessage } from "@/services/api/api-error";
-import { formatDateTime, label as toLabel } from "@/lib/format";
+import { useDepartments, useSpecialties } from "@/hooks/administration/administration.hooks";
 import {
   useInvitableRoles,
-  useInviteStaff,
+  useManagedUsers,
   usePendingInvitations,
   useResendInvitation,
   useRevokeInvitation,
-  useSetStaffStatus,
-  useStaffAccounts,
+  useSession,
+  useUserStatistics,
 } from "@/hooks/auth/use-session";
-import type { Role } from "@/types/api.types";
+import { errorMessage } from "@/services/api/api-error";
+import { formatDateTime, label as toLabel } from "@/lib/format";
+import type { ManagedUserParams, Role, UserStatistics } from "@/types/api.types";
 
 const inputClass =
-  "w-full px-3 py-2.5 bg-muted border border-border rounded-lg text-[13px] text-foreground outline-none focus:border-blue-600 transition-colors box-border";
+  "w-full rounded-lg border border-border bg-background px-3 py-2 text-[13px] text-foreground outline-none transition-colors focus:border-blue-600";
 
-const EMPTY_FORM = { name: "", email: "", role: "" as Role | "", hospitalId: "", phone: "" };
-
-const STATUS_STYLES: Record<string, { bg: string; text: string }> = {
-  ACTIVE: { bg: "#dcfce7", text: "#16a34a" },
-  INVITED: { bg: "#fef9c3", text: "#ca8a04" },
-  SUSPENDED: { bg: "#fee2e2", text: "#dc2626" },
-  LOCKED: { bg: "#fee2e2", text: "#dc2626" },
-  DEACTIVATED: { bg: "#f1f5f9", text: "#64748b" },
+const STATUS_STYLES: Record<string, string> = {
+  ACTIVE: "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-400",
+  INVITED: "bg-amber-100 text-amber-700 dark:bg-amber-500/15 dark:text-amber-400",
+  SUSPENDED: "bg-red-100 text-red-700 dark:bg-red-500/15 dark:text-red-400",
+  LOCKED: "bg-red-100 text-red-700 dark:bg-red-500/15 dark:text-red-400",
+  DEACTIVATED: "bg-muted text-muted-foreground",
 };
 
+const STAT_LABELS: Array<{ key: keyof UserStatistics; label: string }> = [
+  { key: "total", label: "Total Users" },
+  { key: "active", label: "Active Users" },
+  { key: "pending", label: "Pending Users" },
+  { key: "pendingInvitations", label: "Pending Invitations" },
+  { key: "suspended", label: "Suspended Users" },
+  { key: "doctors", label: "Total Doctors" },
+  { key: "nurses", label: "Total Nurses" },
+  { key: "patients", label: "Total Patients" },
+];
+
 export default function UsersPage() {
+  const session = useSession();
+  const actorRole = (session.data?.role as Role | undefined) ?? "ADMIN";
+
   const [search, setSearch] = useState("");
+  const [role, setRole] = useState("");
+  const [status, setStatus] = useState("");
+  const [departmentId, setDepartmentId] = useState("");
+  const [verified, setVerified] = useState("");
+  const [profileComplete, setProfileComplete] = useState("");
+  const [sort, setSort] = useState<NonNullable<ManagedUserParams["sort"]>>("createdAt");
+  const [order, setOrder] = useState<"asc" | "desc">("desc");
   const [page, setPage] = useState(1);
-  const [open, setOpen] = useState(false);
-  const [form, setForm] = useState(EMPTY_FORM);
+
+  const [formOpen, setFormOpen] = useState(false);
+  const [formMode, setFormMode] = useState<"CREATE" | "INVITE">("INVITE");
+  const [detailId, setDetailId] = useState<string | null>(null);
 
   const debouncedSearch = useDebouncedValue(search);
-  const staff = useStaffAccounts({ page, pageSize: 20, search: debouncedSearch || undefined });
-  const invitations = usePendingInvitations();
-  const roles = useInvitableRoles();
-  const invite = useInviteStaff();
-  const resend = useResendInvitation();
-  const revoke = useRevokeInvitation();
-  const setStatus = useSetStaffStatus();
-
-  const rows = staff.data?.rows ?? [];
-  const meta = staff.data?.meta;
-
-  const submitInvite = async (event: React.FormEvent) => {
-    event.preventDefault();
-    if (!form.role) {
-      toast.error("Choose a role for this account.");
-      return;
-    }
-    try {
-      const result = await invite.mutateAsync({
-        name: form.name.trim(),
-        email: form.email.trim(),
-        role: form.role,
-        hospitalId: form.hospitalId.trim(),
-        phone: form.phone.trim() || undefined,
-      });
-      toast.success(
-        result.delivered
-          ? `Invitation emailed to ${result.email}`
-          : "Invitation created, but the email could not be sent. Use resend.",
-      );
-      setOpen(false);
-      setForm(EMPTY_FORM);
-    } catch (error) {
-      toast.error(errorMessage(error, "Could not create the invitation."));
-    }
+  const params: ManagedUserParams = {
+    page,
+    pageSize: 20,
+    ...(debouncedSearch ? { search: debouncedSearch } : {}),
+    ...(role ? { role } : {}),
+    ...(status ? { status } : {}),
+    ...(departmentId ? { departmentId } : {}),
+    ...(verified ? { verified: verified as "true" | "false" } : {}),
+    ...(profileComplete ? { profileComplete: profileComplete as "true" | "false" } : {}),
+    sort,
+    order,
   };
 
-  const changeStatus = (userId: string, status: string) => {
-    setStatus.mutate(
-      { userId, status },
-      {
-        onSuccess: () => toast.success("Account status updated"),
-        onError: (error) => toast.error(errorMessage(error, "Could not update the account.")),
-      },
-    );
+  const users = useManagedUsers(params);
+  const statistics = useUserStatistics();
+  const invitations = usePendingInvitations();
+  const roles = useInvitableRoles();
+  const departments = useDepartments({ pageSize: 100 });
+  const specialties = useSpecialties({ pageSize: 100 });
+  const resend = useResendInvitation();
+  const revoke = useRevokeInvitation();
+
+  const rows = users.data?.rows ?? [];
+  const stats = statistics.data;
+
+  const resetPage = () => setPage(1);
+
+  const toggleSort = (column: NonNullable<ManagedUserParams["sort"]>) => {
+    if (sort === column) {
+      setOrder((current) => (current === "asc" ? "desc" : "asc"));
+    } else {
+      setSort(column);
+      setOrder("asc");
+    }
+    resetPage();
+  };
+
+  const openCreate = (mode: "CREATE" | "INVITE") => {
+    setFormMode(mode);
+    setFormOpen(true);
   };
 
   return (
     <div className="p-6">
-      <div className="flex flex-wrap justify-between items-start gap-3 mb-6">
+      <div className="mb-6 flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-extrabold text-foreground mb-1">Staff Accounts</h1>
-          <p className="text-sm text-muted-foreground">
-            Invite staff with a single-use link, control access and audit sign-in factors
+          <h1 className="mb-1 text-2xl font-extrabold text-foreground">User Management</h1>
+          <p className="max-w-2xl text-sm text-muted-foreground">
+            Create, invite, and manage hospital users across all departments from one centralized platform.
           </p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <button
-            onClick={() => setOpen(true)}
-            className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white border-none rounded-xl cursor-pointer font-bold text-sm hover:bg-blue-700 transition-colors"
+            type="button"
+            onClick={() => openCreate("CREATE")}
+            className="inline-flex items-center gap-2 rounded-xl border border-border bg-card px-4 py-2.5 text-sm font-bold text-foreground transition hover:bg-muted"
           >
-            <UserPlus size={16} /> Invite staff
+            <UserPlus size={16} /> Create User
+          </button>
+          <button
+            type="button"
+            onClick={() => openCreate("INVITE")}
+            className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-blue-700"
+          >
+            <Mail size={16} /> Invite User
           </button>
         </div>
       </div>
 
-      <div className="bg-card border border-border rounded-2xl p-4 mb-4 flex gap-3 items-center">
-        <div className="flex-1 relative">
-          <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-          <input
-            value={search}
+      {/* Statistics */}
+      <div className="mb-5 grid grid-cols-2 gap-3 md:grid-cols-4">
+        {STAT_LABELS.map(({ key, label }) => (
+          <div key={key} className="rounded-2xl border border-border bg-card p-4">
+            <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">{label}</p>
+            <p className="mt-1 text-2xl font-extrabold text-foreground">
+              {statistics.isLoading ? "—" : (stats?.[key] ?? 0)}
+            </p>
+          </div>
+        ))}
+      </div>
+
+      {statistics.isError && (
+        <div className="mb-4">
+          <QueryError error={statistics.error} onRetry={() => void statistics.refetch()} />
+        </div>
+      )}
+
+      {/* Filters */}
+      <div className="mb-4 rounded-2xl border border-border bg-card p-4">
+        <div className="grid gap-3 md:grid-cols-12">
+          <div className="relative md:col-span-4">
+            <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+            <input
+              value={search}
+              onChange={(event) => {
+                setSearch(event.target.value);
+                resetPage();
+              }}
+              placeholder="Search name, email, hospital ID or MRN…"
+              className={`${inputClass} pl-9`}
+            />
+          </div>
+          <select
+            value={role}
             onChange={(event) => {
-              setSearch(event.target.value);
-              setPage(1);
+              setRole(event.target.value);
+              resetPage();
             }}
-            placeholder="Search by name, email or hospital ID…"
-            className="w-full pl-9 pr-3 py-2 bg-muted border border-border rounded-lg text-[13px] text-foreground outline-none focus:border-blue-600 transition-colors"
-          />
+            className={`${inputClass} md:col-span-2`}
+            aria-label="Filter by role"
+          >
+            <option value="">All roles</option>
+            {(roles.data ?? []).map((option) => (
+              <option key={option} value={option}>
+                {toLabel(option)}
+              </option>
+            ))}
+          </select>
+          <select
+            value={status}
+            onChange={(event) => {
+              setStatus(event.target.value);
+              resetPage();
+            }}
+            className={`${inputClass} md:col-span-2`}
+            aria-label="Filter by status"
+          >
+            <option value="">All statuses</option>
+            {["ACTIVE", "INVITED", "SUSPENDED", "LOCKED", "DEACTIVATED"].map((option) => (
+              <option key={option} value={option}>
+                {toLabel(option)}
+              </option>
+            ))}
+          </select>
+          <select
+            value={departmentId}
+            onChange={(event) => {
+              setDepartmentId(event.target.value);
+              resetPage();
+            }}
+            className={`${inputClass} md:col-span-2`}
+            aria-label="Filter by department"
+          >
+            <option value="">All departments</option>
+            {(departments.data?.rows ?? []).map((department) => (
+              <option key={department.id} value={department.id}>
+                {department.name}
+              </option>
+            ))}
+          </select>
+          <select
+            value={verified}
+            onChange={(event) => {
+              setVerified(event.target.value);
+              resetPage();
+            }}
+            className={`${inputClass} md:col-span-2`}
+            aria-label="Filter by email verification"
+          >
+            <option value="">Any verification</option>
+            <option value="true">Verified</option>
+            <option value="false">Unverified</option>
+          </select>
+          <select
+            value={profileComplete}
+            onChange={(event) => {
+              setProfileComplete(event.target.value);
+              resetPage();
+            }}
+            className={`${inputClass} md:col-span-3`}
+            aria-label="Filter by profile status"
+          >
+            <option value="">Any profile status</option>
+            <option value="true">Profile complete</option>
+            <option value="false">Profile incomplete</option>
+          </select>
         </div>
       </div>
 
-      <div className="bg-card border border-border rounded-2xl p-5 mb-4">
-        {staff.isLoading && <QueryLoading text="Loading staff accounts…" />}
-        {staff.isError && <QueryError error={staff.error} onRetry={() => void staff.refetch()} />}
+      {/* Table */}
+      <div className="rounded-2xl border border-border bg-card p-5">
+        {users.isLoading && <QueryLoading text="Loading users…" />}
+        {users.isError && <QueryError error={users.error} onRetry={() => void users.refetch()} />}
 
-        {!staff.isLoading && !staff.isError && (
+        {!users.isLoading && !users.isError && (
           <div className="overflow-x-auto">
-            <table className="w-full text-[13px]">
+            <table className="w-full min-w-[1000px] text-[13px]">
               <thead>
                 <tr className="border-b-2 border-border">
-                  {["Staff", "Role", "Hospital ID", "Status", "2FA", "Last sign-in", "Actions"].map((heading) => (
-                    <th key={heading} className="text-left py-2 px-3.5 text-xs font-bold text-muted-foreground">
-                      {heading}
+                  {(
+                    [
+                      ["User", "name"],
+                      ["Email", "email"],
+                      ["Role", "role"],
+                      ["Department", null],
+                      ["Status", "status"],
+                      ["Profile Status", null],
+                      ["Email Verification", null],
+                      ["Date Created", "createdAt"],
+                      ["Actions", null],
+                    ] as Array<[string, ManagedUserParams["sort"] | null]>
+                  ).map(([heading, column]) => (
+                    <th key={heading} className="px-3 py-2 text-left text-xs font-bold text-muted-foreground">
+                      {column ? (
+                        <button
+                          type="button"
+                          onClick={() => toggleSort(column)}
+                          className="inline-flex items-center gap-1 hover:text-foreground"
+                        >
+                          {heading}
+                          <ArrowUpDown size={12} />
+                        </button>
+                      ) : (
+                        heading
+                      )}
                     </th>
                   ))}
                 </tr>
               </thead>
               <tbody>
-                {rows.map((account) => {
-                  const style = STATUS_STYLES[account.status] ?? STATUS_STYLES.DEACTIVATED;
-                  return (
-                    <tr key={account.id} className="border-b border-border">
-                      <td className="py-3.5 px-3.5">
-                        <div className="font-bold text-foreground">{account.name}</div>
-                        <div className="text-[11px] text-muted-foreground">{account.email}</div>
-                      </td>
-                      <td className="py-3.5 px-3.5 text-muted-foreground">{toLabel(account.role)}</td>
-                      <td className="py-3.5 px-3.5 font-mono text-xs text-foreground">
-                        {account.hospitalId ?? "—"}
-                      </td>
-                      <td className="py-3.5 px-3.5">
-                        <span
-                          className="text-[11px] font-bold px-2.5 py-0.5 rounded-full"
-                          style={{ backgroundColor: style.bg, color: style.text }}
-                        >
-                          {toLabel(account.status)}
-                        </span>
-                      </td>
-                      <td className="py-3.5 px-3.5">
-                        {account.twoFactorEnabled ? (
-                          <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#16a34a]">
-                            <ShieldCheck size={13} /> On
+                {rows.map((user) => (
+                  <tr key={user.id} className="border-b border-border last:border-0">
+                    <td className="px-3 py-3">
+                      <div className="flex items-center gap-2.5">
+                        {user.image ? (
+                          <img
+                            src={user.image}
+                            alt=""
+                            className="size-8 shrink-0 rounded-full object-cover"
+                          />
+                        ) : (
+                          <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-muted text-[11px] font-bold text-muted-foreground">
+                            {user.name
+                              .split(/\s+/)
+                              .filter(Boolean)
+                              .slice(0, 2)
+                              .map((part) => part[0]?.toUpperCase())
+                              .join("")}
                           </span>
-                        ) : (
-                          <span className="text-[11px] text-muted-foreground">Off</span>
                         )}
-                      </td>
-                      <td className="py-3.5 px-3.5 text-muted-foreground">
-                        {account.lastLoginAt ? formatDateTime(account.lastLoginAt) : "Never"}
-                      </td>
-                      <td className="py-3.5 px-3.5">
-                        {account.status === "ACTIVE" ? (
+                        <div className="min-w-0">
                           <button
-                            onClick={() => changeStatus(account.id, "SUSPENDED")}
-                            disabled={setStatus.isPending}
-                            className="px-2.5 py-1.5 bg-red-100 text-red-600 border-none rounded-md cursor-pointer text-[11px] font-semibold hover:bg-red-200 transition-colors disabled:opacity-40"
+                            type="button"
+                            onClick={() => setDetailId(user.id)}
+                            className="text-left font-bold text-foreground hover:text-blue-600"
                           >
-                            Suspend
+                            {user.name}
                           </button>
-                        ) : (
-                          <button
-                            onClick={() => changeStatus(account.id, "ACTIVE")}
-                            disabled={setStatus.isPending}
-                            className="px-2.5 py-1.5 bg-green-100 text-green-700 border-none rounded-md cursor-pointer text-[11px] font-semibold hover:bg-green-200 transition-colors disabled:opacity-40"
-                          >
-                            Reactivate
-                          </button>
-                        )}
-                      </td>
-                    </tr>
-                  );
-                })}
+                          {user.mrn && <div className="text-[11px] text-muted-foreground">MRN {user.mrn}</div>}
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-3 py-3 text-muted-foreground">{user.email}</td>
+                    <td className="px-3 py-3 text-foreground">{toLabel(user.role)}</td>
+                    <td className="px-3 py-3 text-muted-foreground">{user.departmentName ?? "—"}</td>
+                    <td className="px-3 py-3">
+                      <span
+                        className={`rounded-full px-2.5 py-0.5 text-[11px] font-bold ${STATUS_STYLES[user.status] ?? STATUS_STYLES.DEACTIVATED}`}
+                      >
+                        {toLabel(user.status)}
+                      </span>
+                    </td>
+                    <td className="px-3 py-3">
+                      <span
+                        className={`inline-flex items-center gap-1 text-[11px] font-semibold ${user.profileCompleted ? "text-emerald-600" : "text-amber-600"}`}
+                      >
+                        {user.profileCompleted ? <CheckCircle2 size={13} /> : <Users size={13} />}
+                        {user.profileCompleted ? "Complete" : "Incomplete"}
+                      </span>
+                    </td>
+                    <td className="px-3 py-3">
+                      <span className={`text-[11px] font-semibold ${user.emailVerified ? "text-emerald-600" : "text-amber-600"}`}>
+                        {user.emailVerified ? "Verified" : "Unverified"}
+                      </span>
+                    </td>
+                    <td className="px-3 py-3 text-muted-foreground">{formatDateTime(user.createdAt)}</td>
+                    <td className="px-3 py-3">
+                      <button
+                        type="button"
+                        onClick={() => setDetailId(user.id)}
+                        className="inline-flex items-center gap-1 rounded-md border border-border bg-background px-2.5 py-1.5 text-[11px] font-semibold text-foreground transition hover:bg-muted"
+                      >
+                        <Eye size={12} /> View
+                      </button>
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
             {rows.length === 0 && (
-              <div className="text-center py-10 text-muted-foreground">No staff accounts match your search.</div>
+              <div className="py-10 text-center text-sm text-muted-foreground">
+                No users match these filters.
+              </div>
             )}
           </div>
         )}
 
-        <ServerPager meta={meta} onPageChange={setPage} />
+        <ServerPager meta={users.data?.meta} onPageChange={setPage} />
       </div>
 
-      <div className="bg-card border border-border rounded-2xl p-5">
-        <div className="flex items-center gap-2 mb-3">
-          <Mail size={16} className="text-muted-foreground" />
+      {/* Pending invitations */}
+      <div className="mt-5 rounded-2xl border border-border bg-card p-5">
+        <div className="mb-3 flex items-center gap-2">
+          <ShieldCheck size={16} className="text-muted-foreground" />
           <h2 className="text-sm font-bold text-foreground">Pending invitations</h2>
         </div>
         {invitations.isLoading && <QueryLoading text="Loading invitations…" />}
         {invitations.isError && (
           <QueryError error={invitations.error} onRetry={() => void invitations.refetch()} />
         )}
-        {invitations.data && invitations.data.length === 0 && (
+        {invitations.data?.length === 0 && (
           <p className="text-[13px] text-muted-foreground">No invitations are waiting to be accepted.</p>
         )}
         <div className="flex flex-col gap-2">
           {(invitations.data ?? []).map((invitation) => (
             <div
               key={invitation.id}
-              className="flex flex-wrap items-center gap-3 p-3 bg-muted rounded-xl text-[13px]"
+              className="flex flex-wrap items-center gap-3 rounded-xl bg-muted px-3 py-2.5 text-[13px]"
             >
-              <CheckCircle2 size={15} className="text-[#ca8a04]" />
-              <div className="flex-1 min-w-[200px]">
+              <Calendar size={15} className="text-amber-600" />
+              <div className="min-w-[200px] flex-1">
                 <div className="font-bold text-foreground">{invitation.name}</div>
                 <div className="text-[11px] text-muted-foreground">
                   {invitation.email} · {toLabel(invitation.role)}
@@ -238,31 +412,31 @@ export default function UsersPage() {
               </span>
               <div className="flex gap-1.5">
                 <button
+                  type="button"
                   onClick={() =>
                     resend.mutate(invitation.id, {
                       onSuccess: (result) =>
-                        toast.success(
-                          result.delivered ? "Invitation re-sent" : "Could not send the invitation email",
-                        ),
+                        toast.success(result.delivered ? "Invitation re-sent." : "Could not send the invitation email."),
                       onError: (error) => toast.error(errorMessage(error, "Could not resend the invitation.")),
                     })
                   }
                   disabled={resend.isPending}
-                  className="px-2.5 py-1.5 bg-card border border-border text-foreground rounded-md cursor-pointer text-[11px] font-semibold disabled:opacity-40"
+                  className="rounded-md border border-border bg-card px-2.5 py-1.5 text-[11px] font-semibold text-foreground disabled:opacity-40"
                 >
                   Resend
                 </button>
                 <button
+                  type="button"
                   onClick={() =>
                     revoke.mutate(invitation.id, {
-                      onSuccess: () => toast.success("Invitation revoked"),
+                      onSuccess: () => toast.success("Invitation revoked."),
                       onError: (error) => toast.error(errorMessage(error, "Could not revoke the invitation.")),
                     })
                   }
                   disabled={revoke.isPending}
-                  className="px-2.5 py-1.5 bg-red-100 text-red-600 border-none rounded-md cursor-pointer text-[11px] font-semibold disabled:opacity-40"
+                  className="inline-flex items-center gap-1 rounded-md bg-red-100 px-2.5 py-1.5 text-[11px] font-semibold text-red-700 disabled:opacity-40"
                 >
-                  Revoke
+                  <UserX size={12} /> Revoke
                 </button>
               </div>
             </div>
@@ -270,102 +444,33 @@ export default function UsersPage() {
         </div>
       </div>
 
-      {open && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <form
-            onSubmit={submitInvite}
-            className="bg-card border border-border rounded-[20px] p-8 w-[480px] max-h-[90vh] overflow-y-auto"
-          >
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-extrabold text-foreground">Invite a staff member</h2>
-              <button
-                type="button"
-                onClick={() => setOpen(false)}
-                className="bg-transparent border-none cursor-pointer text-muted-foreground hover:text-foreground"
-              >
-                <X size={20} />
-              </button>
-            </div>
+      <UserFormModal
+        open={formOpen}
+        initialMode={formMode}
+        roles={roles.data ?? []}
+        departments={departments.data?.rows ?? []}
+        specialties={specialties.data?.rows ?? []}
+        onClose={() => setFormOpen(false)}
+        onCreated={() => {
+          void users.refetch();
+          void statistics.refetch();
+          void invitations.refetch();
+        }}
+      />
 
-            <div className="grid grid-cols-2 gap-3.5">
-              <div className="col-span-2">
-                <label className="block text-xs font-bold text-muted-foreground mb-1.5">Full name</label>
-                <input
-                  value={form.name}
-                  onChange={(event) => setForm({ ...form, name: event.target.value })}
-                  required
-                  className={inputClass}
-                />
-              </div>
-              <div className="col-span-2">
-                <label className="block text-xs font-bold text-muted-foreground mb-1.5">Email</label>
-                <input
-                  type="email"
-                  value={form.email}
-                  onChange={(event) => setForm({ ...form, email: event.target.value })}
-                  required
-                  className={inputClass}
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-bold text-muted-foreground mb-1.5">Role</label>
-                <select
-                  value={form.role}
-                  onChange={(event) => setForm({ ...form, role: event.target.value as Role })}
-                  required
-                  className={inputClass}
-                >
-                  <option value="">Select a role</option>
-                  {(roles.data ?? []).map((role) => (
-                    <option key={role} value={role}>
-                      {toLabel(role)}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className="block text-xs font-bold text-muted-foreground mb-1.5">Hospital ID</label>
-                <input
-                  value={form.hospitalId}
-                  onChange={(event) => setForm({ ...form, hospitalId: event.target.value })}
-                  placeholder="MGH-10042"
-                  required
-                  className={`${inputClass} uppercase`}
-                />
-              </div>
-              <div className="col-span-2">
-                <label className="block text-xs font-bold text-muted-foreground mb-1.5">Phone (optional)</label>
-                <input
-                  value={form.phone}
-                  onChange={(event) => setForm({ ...form, phone: event.target.value })}
-                  className={inputClass}
-                />
-              </div>
-            </div>
-
-            <p className="text-[11px] text-muted-foreground mt-4">
-              The invitation link is single use and expires automatically. The role and hospital ID
-              are fixed by this invitation.
-            </p>
-
-            <div className="flex gap-2.5 mt-6 justify-end">
-              <button
-                type="button"
-                onClick={() => setOpen(false)}
-                className="px-5 py-2.5 bg-muted border border-border rounded-xl cursor-pointer font-semibold text-[13px] text-foreground hover:bg-accent transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                disabled={invite.isPending}
-                className="px-5 py-2.5 bg-blue-600 text-white border-none rounded-xl cursor-pointer font-bold text-[13px] hover:bg-blue-700 transition-colors disabled:opacity-60"
-              >
-                {invite.isPending ? "Sending…" : "Send invitation"}
-              </button>
-            </div>
-          </form>
-        </div>
+      {detailId && (
+        <UserDetailModal
+          userId={detailId}
+          actorRole={actorRole}
+          roles={roles.data ?? []}
+          departments={departments.data?.rows ?? []}
+          specialties={specialties.data?.rows ?? []}
+          onClose={() => {
+            setDetailId(null);
+            void users.refetch();
+            void statistics.refetch();
+          }}
+        />
       )}
     </div>
   );

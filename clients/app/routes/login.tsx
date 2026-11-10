@@ -228,6 +228,14 @@ export default function Login() {
             </Link>{" "}
             do not use the Daily Access Code.
           </p>
+
+          <p className="mt-3 text-xs leading-relaxed text-muted-foreground">
+            Already accepted a staff invitation but still need to verify your email or finish your profile?{" "}
+            <Link to="/login" className="font-semibold text-foreground underline underline-offset-4">
+              Sign in to continue activation
+            </Link>
+            . The dashboard stays closed until both steps are complete.
+          </p>
         </main>
       </div>
     );

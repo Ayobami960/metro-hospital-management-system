@@ -308,6 +308,71 @@ export const deleteFile = async (actor: Actor, id: string, ip?: string): Promise
   return { id: row.id, deleted: true };
 };
 
+/**
+ * Patient documents uploaded during registration / profile completion.
+ *
+ * The patient row may not exist yet (an invited patient completes onboarding
+ * first), so the file starts unlinked and `savePatientProfile` attaches every
+ * orphaned upload to the patient record once it is created.
+ */
+export const uploadPatientOnboardingDocument = async (
+  actor: Actor,
+  buffer: Buffer,
+  originalName: string,
+  ip?: string,
+): Promise<FileDto> => {
+  if (actor.role !== "PATIENT") throw forbidden("Only patient accounts can upload medical documents here.");
+  requirePermission(actor, "file:write");
+
+  const detected = await detectContent(buffer, originalName);
+  const stored = await storage().upload({
+    buffer,
+    contentType: detected.contentType,
+    ownerType: "PATIENT",
+    extension: detected.extension,
+  });
+  const [row] = await db
+    .insert(files)
+    .values({
+      ownerType: "PATIENT",
+      ownerId: actor.patientId,
+      patientId: actor.patientId,
+      fileName: safeDisplayName(originalName || `document.${detected.extension}`),
+      contentType: detected.contentType,
+      sizeBytes: stored.sizeBytes,
+      provider: stored.provider,
+      providerKey: stored.key,
+      checksumSha256: stored.checksumSha256,
+      url: null,
+      uploadedBy: actor.id,
+    })
+    .returning();
+  if (!row) throw new AppError("INTERNAL_ERROR", "File insert failed");
+
+  await writeAudit({
+    actorId: actor.id,
+    actorRole: actor.role,
+    action: "file.upload",
+    module: "files",
+    entityType: "file",
+    entityId: row.id,
+    detail: { ownerType: "PATIENT", onboarding: true, contentType: detected.contentType },
+    ip,
+  });
+  return serialize(row);
+};
+
+/** Documents visible to a patient before their patient record exists. */
+export const listOwnOnboardingDocuments = async (actor: Actor): Promise<FileDto[]> => {
+  const rows = await db
+    .select()
+    .from(files)
+    .where(and(eq(files.uploadedBy, actor.id), eq(files.ownerType, "PATIENT"), isNull(files.deletedAt)))
+    .orderBy(desc(files.createdAt))
+    .limit(50);
+  return rows.map(serialize);
+};
+
 export const uploadAvatar = async (
   actor: Actor,
   buffer: Buffer,

@@ -24,9 +24,11 @@ type CookieContext = {
  *
  * Two database hooks enforce the corrected workflow:
  *  - a new account receives an EMAIL_VERIFICATION code immediately;
- *  - a staff session may only be created after a valid Room Access
- *    authorization was obtained with the Daily Access Code. That authorization
- *    is consumed here, so it can never be reused as a login session.
+ *  - a fully onboarded staff session may only be created after a valid Room
+ *    Access authorization was obtained with the Daily Access Code. That
+ *    authorization is consumed here, so it can never be reused as a login
+ *    session. First-time staff are allowed a session to verify their email and
+ *    complete their profile, but every dashboard route remains gated.
  */
 export const auth = betterAuth({
   baseURL: env.betterAuthUrl,
@@ -85,7 +87,12 @@ export const auth = betterAuth({
       create: {
         before: async (session, context) => {
           const [row] = await db
-            .select({ role: schema.users.role, status: schema.users.status })
+            .select({
+              role: schema.users.role,
+              status: schema.users.status,
+              emailVerified: schema.users.emailVerified,
+              onboardingCompletedAt: schema.users.onboardingCompletedAt,
+            })
             .from(schema.users)
             .where(eq(schema.users.id, session.userId))
             .limit(1);
@@ -95,6 +102,12 @@ export const auth = betterAuth({
             throw new APIError("FORBIDDEN", { message: "This account is not active." });
           }
           if (!isRoomAccessRole(row.role as UserRole)) return;
+
+          // First-time staff activate through the invitation flow: they need a
+          // session to verify their email and complete their profile, so the
+          // Room Access gate applies only once that onboarding is finished.
+          // The dashboard itself stays behind the progress gate until then.
+          if (!row.emailVerified || !row.onboardingCompletedAt) return;
 
           const cookieContext = context as CookieContext | null;
           const token = cookieContext?.getCookie?.(ROOM_ACCESS_COOKIE) ?? null;

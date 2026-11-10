@@ -39,6 +39,8 @@ export const patients = hms.table(
     lastName: text("last_name").notNull(),
     middleName: text("middle_name"),
     dateOfBirth: date("date_of_birth").notNull(),
+    /** Patient-facing gender identity from self-registration; clinical sex remains below. */
+    gender: text("gender"),
     sexAtBirth: sexAtBirth("sex_at_birth").default("UNKNOWN").notNull(),
     bloodType: bloodType("blood_type").default("UNKNOWN").notNull(),
     phone: text("phone"),
@@ -186,12 +188,11 @@ export const patientInsurance = hms.table(
     patientId: uuid("patient_id")
       .notNull()
       .references(() => patients.id, { onDelete: "cascade" }),
-    insurerId: uuid("insurer_id")
-      .notNull()
-      .references(() => insurers.id),
-    planId: uuid("plan_id")
-      .notNull()
-      .references(() => insurancePlans.id),
+    /** Null for self-reported policies until an administrator maps them to a plan. */
+    insurerId: uuid("insurer_id").references(() => insurers.id),
+    planId: uuid("plan_id").references(() => insurancePlans.id),
+    providerName: text("provider_name"),
+    planName: text("plan_name"),
     policyNumber: text("policy_number").notNull(),
     groupNumber: text("group_number"),
     memberId: text("member_id"),
@@ -224,6 +225,26 @@ export const patientMetrics = hms.table(
     createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
   },
   (t) => [index("metric_patient_type_idx").on(t.patientId, t.type, t.recordedAt)],
+);
+
+/**
+ * Cross-device progress for the mandatory patient profile wizard.
+ *
+ * Drafts never touch the clinical patient tables and are not part of
+ * onboarding state: only a complete submission creates/updates the patient
+ * record and sets `onboarding_completed_at`. The row is removed on completion.
+ */
+export const patientProfileDrafts = hms.table(
+  "patient_profile_draft",
+  {
+    id: idColumn(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    data: jsonb("data").$type<Record<string, unknown>>().notNull().default({}),
+    ...timestamps,
+  },
+  (t) => [uniqueIndex("patient_profile_draft_user_uq").on(t.userId)],
 );
 
 export const patientConsents = hms.table("patient_consent", {

@@ -32,6 +32,10 @@ export const API_ENDPOINTS = {
     regenerateRecoveryCodes: "/account/totp/recovery-codes",
     onboarding: "/account/onboarding",
     onboardingAvatar: "/account/onboarding/avatar",
+    patientRegistration: "/account/patient-registration",
+    patientProfileDraft: "/account/patient-profile/draft",
+    documents: "/account/documents",
+    document: (fileId: string) => `/account/documents/${id(fileId)}`,
   },
 
   /** Public Room Access verification for hospital staff (no login session). */
@@ -43,12 +47,16 @@ export const API_ENDPOINTS = {
 
   staffUsers: {
     list: "/users",
+    statistics: "/users/statistics",
     roles: "/users/roles",
+    create: "/users",
     invite: "/users/invite",
     invitations: "/users/invitations",
+    user: (userId: string) => `/users/${id(userId)}`,
+    role: (userId: string) => `/users/${id(userId)}/role`,
+    status: (userId: string) => `/users/${id(userId)}/status`,
     resendInvitation: (invitationId: string) => `/users/invitations/${id(invitationId)}/resend`,
     revokeInvitation: (invitationId: string) => `/users/invitations/${id(invitationId)}`,
-    status: (userId: string) => `/users/${id(userId)}/status`,
   },
 
   invitations: {

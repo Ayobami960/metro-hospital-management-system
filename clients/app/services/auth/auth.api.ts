@@ -8,11 +8,18 @@ import type {
   AuthChallengeResult,
   InvitationPreview,
   InviteStaffInput,
+  ManagedUser,
+  ManagedUserDetail,
+  ManagedUserParams,
   OnboardingInput,
   OnboardingStatus,
   OtpResendResult,
   OtpVerificationResult,
   Paginated,
+  PatientDocument,
+  PatientDraft,
+  PatientDraftEnvelope,
+  PatientProfileInput,
   RecoveryCodesResult,
   Role,
   RoomAccessRequestResult,
@@ -23,6 +30,8 @@ import type {
   StaffDirectoryParams,
   StaffInvitation,
   TotpEnrollment,
+  UpdateManagedUserInput,
+  UserStatistics,
 } from "@/types/api.types";
 
 /**
@@ -123,6 +132,35 @@ export const authApi = {
     return unwrap(response.data);
   },
 
+  registerPatient: async (patient: PatientProfileInput): Promise<OnboardingStatus> =>
+    postEnvelope<OnboardingStatus>(API_ENDPOINTS.account.patientRegistration, { patient }),
+
+  patientDraft: async (): Promise<PatientDraftEnvelope | null> =>
+    (await getEnvelope<{ draft: PatientDraftEnvelope | null }>(API_ENDPOINTS.account.patientProfileDraft))
+      .draft,
+
+  savePatientDraft: async (draft: PatientDraft): Promise<{ updatedAt: string }> => {
+    const response = await apiClient.put<ApiEnvelope<{ saved: boolean; updatedAt: string }>>(
+      API_ENDPOINTS.account.patientProfileDraft,
+      draft,
+    );
+    return unwrap(response.data);
+  },
+
+  uploadOnboardingDocument: async (file: File): Promise<PatientDocument> => {
+    const form = new FormData();
+    form.append("file", file);
+    const response = await apiClient.post<ApiEnvelope<PatientDocument>>(
+      API_ENDPOINTS.account.documents,
+      form,
+    );
+    return unwrap(response.data);
+  },
+
+  deleteOnboardingDocument: async (fileId: string): Promise<void> => {
+    await apiClient.delete(API_ENDPOINTS.account.document(fileId));
+  },
+
   /* TOTP enrollment */
 
   enrollTotp: async (): Promise<TotpEnrollment> =>
@@ -162,6 +200,44 @@ export const authApi = {
     const response = await apiClient.get<StaffAccount[]>(API_ENDPOINTS.staffUsers.list, { params });
     return unwrapPage(response.data);
   },
+
+  listManagedUsers: async (params: ManagedUserParams = {}): Promise<Paginated<ManagedUser>> => {
+    const response = await apiClient.get<ManagedUser[]>(API_ENDPOINTS.staffUsers.list, { params });
+    return unwrapPage(response.data);
+  },
+
+  userStatistics: async (): Promise<UserStatistics> =>
+    getEnvelope<UserStatistics>(API_ENDPOINTS.staffUsers.statistics),
+
+  managedUser: async (userId: string): Promise<ManagedUserDetail> =>
+    getEnvelope<ManagedUserDetail>(API_ENDPOINTS.staffUsers.user(userId)),
+
+  updateManagedUser: async (
+    userId: string,
+    input: UpdateManagedUserInput,
+  ): Promise<ManagedUserDetail> => {
+    const response = await apiClient.patch<ApiEnvelope<ManagedUserDetail>>(
+      API_ENDPOINTS.staffUsers.user(userId),
+      input,
+    );
+    return unwrap(response.data);
+  },
+
+  changeUserRole: async (userId: string, role: Role): Promise<ManagedUserDetail> => {
+    const response = await apiClient.patch<ApiEnvelope<ManagedUserDetail>>(
+      API_ENDPOINTS.staffUsers.role(userId),
+      { role },
+    );
+    return unwrap(response.data);
+  },
+
+  createUser: async (input: InviteStaffInput): Promise<{
+    invitationId: string;
+    email: string;
+    role: Role;
+    expiresAt: string;
+    delivered: boolean;
+  }> => postEnvelope(API_ENDPOINTS.staffUsers.create, { ...input, mode: "CREATE" }),
 
   invitableRoles: async (): Promise<Role[]> =>
     (await getEnvelope<{ roles: Role[] }>(API_ENDPOINTS.staffUsers.roles)).roles,
