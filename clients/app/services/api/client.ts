@@ -11,8 +11,13 @@ import { ApiError, toApiError } from "./api-error";
  * - Responses are returned unchanged (`{ data, meta }` envelope) so services
  *   stay thin; failures are normalised into `ApiError`.
  */
+const defaultApiUrl =
+  typeof window !== "undefined" && window.location.hostname !== "localhost"
+    ? `${window.location.origin}/api/v1`
+    : "http://localhost:8011/api/v1";
+
 export const API_BASE_URL =
-  (import.meta.env.VITE_API_URL as string | undefined) ?? "http://localhost:8011/api/v1";
+  (import.meta.env.VITE_API_URL as string | undefined)?.trim() || defaultApiUrl;
 
 export const UNAUTHORIZED_EVENT = "hms:unauthorized";
 
