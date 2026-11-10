@@ -1,9 +1,9 @@
 import express, { type Express } from "express";
-import helmet from "helmet";
+import { default as helmet } from "helmet";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import compression from "compression";
-import rateLimit from "express-rate-limit";
+import { rateLimit } from "express-rate-limit";
 import { toNodeHandler } from "better-auth/node";
 import { env } from "./config/env.js";
 import { NAV, permissionsFor } from "./config/permissions.js";
