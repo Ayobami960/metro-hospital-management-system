@@ -1,0 +1,66 @@
+administration/AdminDashboard.tsx: revenueData, apptTrend, deptData, doctorPerf, recentActivities, departments, stats
+administration/DepartmentsPage.tsx: Department, initialDepts
+administration/DoctorsPage.tsx: Doctor, initialDoctors, specialties, statuses
+administration/MessagesPage.tsx: conversations, messageHistory
+administration/PatientsPage.tsx: Patient, patients
+administration/ReportsPage.tsx: categories, revenueData, deptPerformance, reportList, kpis
+administration/RoomsBedsPage.tsx: RoomType, RoomStatus, Room, allRooms, floors
+administration/SystemLogsPage.tsx: logs, modules, levels
+billing/BillingDashboard.tsx: invoices, claims, revenueData, dailyData, stats
+billing/InsuranceClaimsPage.tsx: mockClaims
+billing/InvoicesPage.tsx: mockInvoices, ServiceLine
+billing/MessagesPage.tsx: conversations, messageHistory
+billing/OutstandingPage.tsx: mockPatients, agingData
+billing/PaymentsPage.tsx: mockPayments, methodData, dailyData
+billing/ReportsPage.tsx: reportTypes, datePresets, revenueData, departmentData
+billing/SettingsPage.tsx: tabs, devices, Props
+doctor/AnalyticsPage.tsx: appointmentsPerDay, satisfactionTrend, apptTypeDistribution, topDiagnoses
+doctor/AppointmentsPage.tsx: todayAppointments, weekAppointments
+doctor/DoctorDashboard.tsx: apptData, revenueData, diagnosisData, todayPatients, pendingRequests, recentPrescriptions, stats
+doctor/EMRPage.tsx: patients, patientData, EMRTab
+doctor/LabOrdersPage.tsx: labOrders, testOptions
+doctor/MessagesPage.tsx: conversations, messageHistory
+doctor/PatientsPage.tsx: patients
+doctor/PrescriptionsPage.tsx: prescriptions, refillRequests
+doctor/SchedulePage.tsx: days, dayShort, dates, hours, hourIndex, Appt, appointments
+doctor/SettingsPage.tsx: tabs, devices, Props
+lab/EquipmentLogPage.tsx: EquipStatus, Equipment, MaintenanceEntry, initialEquipment, initialLog, maintenanceTypes
+lab/LabDashboard.tsx: testRequests, completedResults, nextStatus, stats
+lab/MessagesPage.tsx: conversations, messageHistory
+lab/RadiologyPage.tsx: StudyType, StudyStatus, RadiologyOrder, orders, TabType
+lab/ResultsEntryPage.tsx: FieldDef, testTemplates, testRequests
+lab/SampleTrackingPage.tsx: SampleStatus, Sample, CustodyEntry, initialSamples, custodyHistory, statusOrder
+lab/SettingsPage.tsx: tabs, devices, Props
+lab/TestRequestsPage.tsx: allRequests, technicians
+nurse/AssignedPatientsPage.tsx: assignedPatients
+nurse/MedicationsPage.tsx: MedStatus, MAREntry, marData
+nurse/MessagesPage.tsx: conversations, messageHistory
+nurse/NurseDashboard.tsx: patients, medicationSchedule, stats
+nurse/ProgressNotesPage.tsx: patientList, Note, existingNotes, templates
+nurse/SettingsPage.tsx: tabs, devices, Props
+nurse/VitalsEntryPage.tsx: patientList, vitalsHistory
+nurse/WardOverviewPage.tsx: RoomStatus, RoomData, ward3B, ward3C, activityFeed
+patient/AppointmentsPage.tsx: upcoming, past, doctors
+patient/BillsPage.tsx: invoices, insurancePlan
+patient/HealthInsightsPage.tsx: bpData, weightData, activityData, healthScore, insights, vitals
+patient/LabResultsPage.tsx: labOrders, hba1cTrend, cholesterolTrend
+patient/MedicalRecordsPage.tsx: timeline, allergies, conditions, immunizations, documents
+patient/MessagesPage.tsx: conversations, messageHistory
+patient/PatientDashboard.tsx: bpData, weightData, appointments, prescriptions, labResults, statCards, quickActions
+patient/PrescriptionsPage.tsx: prescriptions, interactions
+patient/SettingsPage.tsx: tabs, devices, Props
+pharmacy/DispensePage.tsx: prescriptions, initialLog, checklistItems
+pharmacy/DrugInteractionsPage.tsx: drugDatabase, Interaction, interactions
+pharmacy/DrugOrdersPage.tsx: initialOrders, OrderForm
+pharmacy/InventoryPage.tsx: initialInventory, categories, AddStockForm
+pharmacy/MessagesPage.tsx: conversations, messageHistory
+pharmacy/PharmacyDashboard.tsx: prescriptions, inventory, dispensedData, stats, nextStatus
+pharmacy/PrescriptionsPage.tsx: initialPrescriptions, nextStatus, actionLabel
+pharmacy/SettingsPage.tsx: tabs, devices, Props
+reception/AppointmentsPage.tsx: card, inp, DAYS, MONTHS, DOCTORS, APPT_TYPES, Appointment, initialAppts
+reception/CheckInPage.tsx: Patient, patients, CheckInMode
+reception/MessagesPage.tsx: conversations, messageHistory
+reception/QueueManagerPage.tsx: card, inp, QueueStatus, QueueEntry, initialQueue, DOCTORS, ROOMS
+reception/ReceptionDashboard.tsx: queue, todayAppts, stats
+reception/RegisterPatientPage.tsx: Step1, Step2
+reception/SettingsPage.tsx: tabs, devices, Props
