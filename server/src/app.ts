@@ -72,9 +72,14 @@ export const createApp = (): Express => {
     }),
   );
 
-  app.get(`${API}/health`, (_req, res) => {
+  const healthHandler: RequestHandler = (_req, res) => {
     ok(res, { status: "ok", uptimeSeconds: Math.round(process.uptime()), version: "1.0.0" });
-  });
+  };
+
+  // Deliberately database-free: distinguishes "function booted" from "database
+  // unreachable" (see `/health/ready` for the dependency check).
+  app.get(`${API}/health`, healthHandler);
+  app.get("/api/health", healthHandler);
 
   app.get(`${API}/health/ready`, async (_req, res) => {
     const dbOk = await checkDatabase();

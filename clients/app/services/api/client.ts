@@ -11,13 +11,49 @@ import { ApiError, toApiError } from "./api-error";
  * - Responses are returned unchanged (`{ data, meta }` envelope) so services
  *   stay thin; failures are normalised into `ApiError`.
  */
-const defaultApiUrl =
-  typeof window !== "undefined" && window.location.hostname !== "localhost"
-    ? `${window.location.origin}/api/v1`
-    : "http://localhost:8011/api/v1";
+const LOCAL_API_URL = "http://localhost:8011/api/v1";
 
-export const API_BASE_URL =
-  (import.meta.env.VITE_API_URL as string | undefined)?.trim() || defaultApiUrl;
+const isBrowser = typeof window !== "undefined";
+
+const isAbsoluteUrl = (value: string): boolean =>
+  /^[a-z][a-z\d+\-.]*:/i.test(value) || value.startsWith("//");
+
+/** Only absolute values can serve as a base; a relative one would throw. */
+const serverApiOrigin =
+  (typeof process !== "undefined" &&
+    [process.env.API_ORIGIN, process.env.VITE_API_URL]
+      .map((value) => value?.trim())
+      .find((value): value is string => typeof value === "string" && isAbsoluteUrl(value))) ||
+  LOCAL_API_URL;
+
+const defaultApiUrl = isBrowser ? `${window.location.origin}/api/v1` : LOCAL_API_URL;
+
+const configuredApiUrl = (import.meta.env.VITE_API_URL as string | undefined)?.trim();
+
+/**
+ * Resolve a URL without ever throwing. This module is imported by the SSR route
+ * tree: `new URL("/api/v1")` on a relative `VITE_API_URL` crashed the serverless
+ * function at startup with `TypeError: Invalid URL` (500
+ * FUNCTION_INVOCATION_FAILED). Accepts absolute (`https://host/api/v1`),
+ * protocol-relative (`//host/api/v1`), bare host (`host/api/v1`) and relative
+ * (`/api/v1`) values.
+ */
+const resolveApiUrl = (value: string): URL => {
+  try {
+    if (isAbsoluteUrl(value)) return new URL(value.startsWith("//") ? `https:${value}` : value);
+    if (!value.startsWith("/")) return new URL(`https://${value}`);
+    return new URL(value, isBrowser ? window.location.origin : serverApiOrigin);
+  } catch {
+    // Last resort: keep module evaluation (and therefore the SSR function) alive.
+    return new URL(LOCAL_API_URL);
+  }
+};
+
+/** A relative value stays relative so browser calls go to the app's own origin. */
+export const API_BASE_URL = configuredApiUrl || defaultApiUrl;
+
+/** Absolute origin for clients (better-auth) that require one. */
+export const API_ORIGIN = resolveApiUrl(API_BASE_URL).origin;
 
 export const UNAUTHORIZED_EVENT = "hms:unauthorized";
 
