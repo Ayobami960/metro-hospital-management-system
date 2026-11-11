@@ -1,5 +1,5 @@
 import express, { type Express, type RequestHandler } from "express";
-import { createRequire } from "node:module";
+import helmet from "helmet";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import compression from "compression";
@@ -42,9 +42,6 @@ import { roomAccessRouter } from "./routes/room-access.routes.js";
 import { openApiDocument } from "./openapi.js";
 
 const API = "/api/v1";
-const helmet = createRequire(import.meta.url)("helmet") as (
-  options: { crossOriginResourcePolicy: { policy: "cross-origin" } },
-) => RequestHandler;
 
 export const createApp = (): Express => {
   const app = express();
