@@ -76,7 +76,7 @@ export const createApp = (): Express => {
   // Deliberately database-free: distinguishes "function booted" from "database
   // unreachable" (see `/health/ready` for the dependency check).
   app.get(`${API}/health`, healthHandler);
-  app.get("/api/health", healthHandler);
+  app.get("/", healthHandler);
 
   app.get(`${API}/health/ready`, async (_req, res) => {
     const dbOk = await checkDatabase();
