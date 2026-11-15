@@ -96,7 +96,7 @@ export default function LoginVerify() {
   const submittingTotp = verifyTotp.isPending || verifyRecovery.isPending;
   const submittingEmail = verifyEmail.isPending || verifyPatient.isPending;
 
-  const submitSecondFactor = async (event: React.FormEvent) => {
+  const submitSecondFactor = async (event: React.SubmitEvent) => {
     event.preventDefault();
     if (!code.trim()) return;
     setAuthError(null);
@@ -115,7 +115,7 @@ export default function LoginVerify() {
     }
   };
 
-  const submitEmailCode = async (event: React.FormEvent) => {
+  const submitEmailCode = async (event: React.SubmitEvent) => {
     event.preventDefault();
     if (!otpCode.trim()) return;
     setAuthError(null);
@@ -128,7 +128,7 @@ export default function LoginVerify() {
     }
   };
 
-  const submitPatientCode = async (event: React.FormEvent) => {
+  const submitPatientCode = async (event: React.SubmitEvent) => {
     event.preventDefault();
     if (!otpCode.trim()) return;
     setAuthError(null);

@@ -30,14 +30,7 @@ const defaultApiUrl = isBrowser ? `${window.location.origin}/api/v1` : LOCAL_API
 
 const configuredApiUrl = (import.meta.env.VITE_API_URL as string | undefined)?.trim();
 
-/**
- * Resolve a URL without ever throwing. This module is imported by the SSR route
- * tree: `new URL("/api/v1")` on a relative `VITE_API_URL` crashed the serverless
- * function at startup with `TypeError: Invalid URL` (500
- * FUNCTION_INVOCATION_FAILED). Accepts absolute (`https://host/api/v1`),
- * protocol-relative (`//host/api/v1`), bare host (`host/api/v1`) and relative
- * (`/api/v1`) values.
- */
+
 const resolveApiUrl = (value: string): URL => {
   try {
     if (isAbsoluteUrl(value)) return new URL(value.startsWith("//") ? `https:${value}` : value);
@@ -64,7 +57,7 @@ export const apiClient = axios.create({
   headers: { Accept: "application/json" },
 });
 
-apiClient.interceptors.request.use((config) => {
+apiClient.interceptors.request.use((config: any) => {
   // Let the browser set the multipart boundary; only JSON bodies get a header.
   if (config.data instanceof FormData) {
     delete config.headers["Content-Type"];
@@ -73,7 +66,7 @@ apiClient.interceptors.request.use((config) => {
 });
 
 apiClient.interceptors.response.use(
-  (response) => response,
+  (response: any) => response,
   (error: unknown) => {
     const apiError = toApiError(error);
     if (apiError.status === 401 && typeof window !== "undefined") {

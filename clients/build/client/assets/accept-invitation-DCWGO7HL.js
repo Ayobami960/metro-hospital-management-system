@@ -1,0 +1,1 @@
+import{o as e}from"./components-DlFJwJns.js";import{t}from"./activate-account-Doljcpop.js";var n=e(t);export{n as default};

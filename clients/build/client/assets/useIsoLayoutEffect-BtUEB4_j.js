@@ -1,0 +1,1 @@
+import{a as e,n as t}from"./jsx-runtime-B-hcVAMW.js";var n=e(t(),1),r={};function i(e,t){let i=n.useRef(r);return i.current===r&&(i.current=e(t)),i}function a(){}var o=Object.freeze([]),s=Object.freeze({}),c=typeof document<`u`?n.useLayoutEffect:()=>{};export{i as a,a as i,o as n,s as r,c as t};
