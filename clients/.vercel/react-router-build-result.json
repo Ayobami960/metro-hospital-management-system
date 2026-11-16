@@ -1,0 +1,1643 @@
+{
+  "buildManifest": {
+    "serverBundles": {
+      "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0": {
+        "id": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+        "file": "build/server/nodejs_eyJydW50aW1lIjoibm9kZWpzIn0/index.js",
+        "config": {
+          "runtime": "nodejs"
+        }
+      }
+    },
+    "routeIdToServerBundleId": {
+      "routes/home": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/room": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/login": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/register": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/login-verify": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/verify-email": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/complete-profile": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/patient-complete-profile": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/activate-account": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/accept-invitation": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/protected/administration/AdminDashboard": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/protected/administration/DoctorsPage": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/protected/administration/PatientsPage": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/protected/administration/DepartmentsPage": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/protected/administration/AppointmentsPage": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/protected/administration/ReportsPage": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/protected/administration/RoomsBedsPage": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/protected/administration/SystemLogsPage": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/protected/administration/SettingsPage": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/protected/administration/UsersPage": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/protected/doctor/DoctorDashboard": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/protected/doctor/AppointmentsPage": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/protected/doctor/PatientsPage": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/protected/doctor/PrescriptionsPage": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/protected/doctor/LabOrdersPage": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/protected/doctor/EMRPage": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/protected/doctor/MessagesPage": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/protected/doctor/SchedulePage": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/protected/doctor/AnalyticsPage": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/protected/doctor/SettingsPage": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/protected/nurse/NurseDashboard": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/protected/nurse/AssignedPatientsPage": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/protected/nurse/VitalsEntryPage": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/protected/nurse/MedicationsPage": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/protected/nurse/ProgressNotesPage": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/protected/nurse/WardOverviewPage": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/protected/nurse/MessagesPage": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/protected/nurse/SettingsPage": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/protected/patient/PatientDashboard": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/protected/patient/AppointmentsPage": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/protected/patient/MedicalRecordsPage": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/protected/patient/LabResultsPage": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/protected/patient/PrescriptionsPage": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/protected/patient/BillsPage": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/protected/patient/MessagesPage": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/protected/patient/HealthInsightsPage": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/protected/patient/SettingsPage": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/protected/reception/ReceptionDashboard": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/protected/reception/RegisterPatientPage": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/protected/reception/AppointmentsPage": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/protected/reception/QueueManagerPage": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/protected/reception/CheckInPage": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/protected/reception/MessagesPage": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/protected/reception/SettingsPage": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/protected/pharmacy/PharmacyDashboard": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/protected/pharmacy/PrescriptionsPage": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/protected/pharmacy/InventoryPage": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/protected/pharmacy/DispensePage": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/protected/pharmacy/DrugOrdersPage": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/protected/pharmacy/DrugInteractionsPage": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/protected/pharmacy/MessagesPage": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/protected/pharmacy/SettingsPage": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/protected/lab/LabDashboard": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/protected/lab/TestRequestsPage": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/protected/lab/ResultsEntryPage": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/protected/lab/SampleTrackingPage": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/protected/lab/EquipmentLogPage": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/protected/lab/RadiologyPage": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/protected/lab/MessagesPage": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/protected/lab/SettingsPage": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/protected/billing/BillingDashboard": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/protected/billing/InvoicesPage": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/protected/billing/PaymentsPage": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/protected/billing/InsuranceClaimsPage": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/protected/billing/OutstandingPage": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/protected/billing/ReportsPage": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/protected/billing/MessagesPage": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/protected/billing/SettingsPage": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0"
+    },
+    "routes": {
+      "root": {
+        "id": "root",
+        "file": "app/root.tsx",
+        "path": "",
+        "config": {}
+      },
+      "routes/home": {
+        "id": "routes/home",
+        "parentId": "root",
+        "file": "app/routes/home.tsx",
+        "index": true,
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/room": {
+        "id": "routes/room",
+        "parentId": "root",
+        "file": "app/routes/room.tsx",
+        "path": "room",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/login": {
+        "id": "routes/login",
+        "parentId": "root",
+        "file": "app/routes/login.tsx",
+        "path": "login",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/register": {
+        "id": "routes/register",
+        "parentId": "root",
+        "file": "app/routes/register.tsx",
+        "path": "register",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/login-verify": {
+        "id": "routes/login-verify",
+        "parentId": "root",
+        "file": "app/routes/login-verify.tsx",
+        "path": "login/verify",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/verify-email": {
+        "id": "routes/verify-email",
+        "parentId": "root",
+        "file": "app/routes/verify-email.tsx",
+        "path": "verify-email",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/complete-profile": {
+        "id": "routes/complete-profile",
+        "parentId": "root",
+        "file": "app/routes/complete-profile.tsx",
+        "path": "complete-profile",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/patient-complete-profile": {
+        "id": "routes/patient-complete-profile",
+        "parentId": "root",
+        "file": "app/routes/patient-complete-profile.tsx",
+        "path": "patient/complete-profile",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/activate-account": {
+        "id": "routes/activate-account",
+        "parentId": "root",
+        "file": "app/routes/activate-account.tsx",
+        "path": "activate-account",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/accept-invitation": {
+        "id": "routes/accept-invitation",
+        "parentId": "root",
+        "file": "app/routes/accept-invitation.tsx",
+        "path": "accept-invitation",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/protected/layout": {
+        "id": "routes/protected/layout",
+        "parentId": "root",
+        "file": "app/routes/protected/layout.tsx",
+        "config": {}
+      },
+      "routes/protected/administration/AdminDashboard": {
+        "id": "routes/protected/administration/AdminDashboard",
+        "parentId": "routes/protected/layout",
+        "file": "app/routes/protected/administration/AdminDashboard.tsx",
+        "path": "administration/dashboard",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/protected/administration/DoctorsPage": {
+        "id": "routes/protected/administration/DoctorsPage",
+        "parentId": "routes/protected/layout",
+        "file": "app/routes/protected/administration/DoctorsPage.tsx",
+        "path": "administration/doctors",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/protected/administration/PatientsPage": {
+        "id": "routes/protected/administration/PatientsPage",
+        "parentId": "routes/protected/layout",
+        "file": "app/routes/protected/administration/PatientsPage.tsx",
+        "path": "administration/patients",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/protected/administration/DepartmentsPage": {
+        "id": "routes/protected/administration/DepartmentsPage",
+        "parentId": "routes/protected/layout",
+        "file": "app/routes/protected/administration/DepartmentsPage.tsx",
+        "path": "administration/departments",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/protected/administration/AppointmentsPage": {
+        "id": "routes/protected/administration/AppointmentsPage",
+        "parentId": "routes/protected/layout",
+        "file": "app/routes/protected/administration/AppointmentsPage.tsx",
+        "path": "administration/appointments",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/protected/administration/ReportsPage": {
+        "id": "routes/protected/administration/ReportsPage",
+        "parentId": "routes/protected/layout",
+        "file": "app/routes/protected/administration/ReportsPage.tsx",
+        "path": "administration/reports",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/protected/administration/RoomsBedsPage": {
+        "id": "routes/protected/administration/RoomsBedsPage",
+        "parentId": "routes/protected/layout",
+        "file": "app/routes/protected/administration/RoomsBedsPage.tsx",
+        "path": "administration/rooms-beds",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/protected/administration/SystemLogsPage": {
+        "id": "routes/protected/administration/SystemLogsPage",
+        "parentId": "routes/protected/layout",
+        "file": "app/routes/protected/administration/SystemLogsPage.tsx",
+        "path": "administration/system-logs",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/protected/administration/SettingsPage": {
+        "id": "routes/protected/administration/SettingsPage",
+        "parentId": "routes/protected/layout",
+        "file": "app/routes/protected/administration/SettingsPage.tsx",
+        "path": "administration/settings",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/protected/administration/UsersPage": {
+        "id": "routes/protected/administration/UsersPage",
+        "parentId": "routes/protected/layout",
+        "file": "app/routes/protected/administration/UsersPage.tsx",
+        "path": "administration/users",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/protected/doctor/DoctorDashboard": {
+        "id": "routes/protected/doctor/DoctorDashboard",
+        "parentId": "routes/protected/layout",
+        "file": "app/routes/protected/doctor/DoctorDashboard.tsx",
+        "path": "doctor/dashboard",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/protected/doctor/AppointmentsPage": {
+        "id": "routes/protected/doctor/AppointmentsPage",
+        "parentId": "routes/protected/layout",
+        "file": "app/routes/protected/doctor/AppointmentsPage.tsx",
+        "path": "doctor/appointments",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/protected/doctor/PatientsPage": {
+        "id": "routes/protected/doctor/PatientsPage",
+        "parentId": "routes/protected/layout",
+        "file": "app/routes/protected/doctor/PatientsPage.tsx",
+        "path": "doctor/patients",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/protected/doctor/PrescriptionsPage": {
+        "id": "routes/protected/doctor/PrescriptionsPage",
+        "parentId": "routes/protected/layout",
+        "file": "app/routes/protected/doctor/PrescriptionsPage.tsx",
+        "path": "doctor/prescriptions",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/protected/doctor/LabOrdersPage": {
+        "id": "routes/protected/doctor/LabOrdersPage",
+        "parentId": "routes/protected/layout",
+        "file": "app/routes/protected/doctor/LabOrdersPage.tsx",
+        "path": "doctor/lab-orders",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/protected/doctor/EMRPage": {
+        "id": "routes/protected/doctor/EMRPage",
+        "parentId": "routes/protected/layout",
+        "file": "app/routes/protected/doctor/EMRPage.tsx",
+        "path": "doctor/emr",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/protected/doctor/MessagesPage": {
+        "id": "routes/protected/doctor/MessagesPage",
+        "parentId": "routes/protected/layout",
+        "file": "app/routes/protected/doctor/MessagesPage.tsx",
+        "path": "doctor/messages",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/protected/doctor/SchedulePage": {
+        "id": "routes/protected/doctor/SchedulePage",
+        "parentId": "routes/protected/layout",
+        "file": "app/routes/protected/doctor/SchedulePage.tsx",
+        "path": "doctor/schedule",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/protected/doctor/AnalyticsPage": {
+        "id": "routes/protected/doctor/AnalyticsPage",
+        "parentId": "routes/protected/layout",
+        "file": "app/routes/protected/doctor/AnalyticsPage.tsx",
+        "path": "doctor/analytics",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/protected/doctor/SettingsPage": {
+        "id": "routes/protected/doctor/SettingsPage",
+        "parentId": "routes/protected/layout",
+        "file": "app/routes/protected/doctor/SettingsPage.tsx",
+        "path": "doctor/settings",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/protected/nurse/NurseDashboard": {
+        "id": "routes/protected/nurse/NurseDashboard",
+        "parentId": "routes/protected/layout",
+        "file": "app/routes/protected/nurse/NurseDashboard.tsx",
+        "path": "nurse/dashboard",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/protected/nurse/AssignedPatientsPage": {
+        "id": "routes/protected/nurse/AssignedPatientsPage",
+        "parentId": "routes/protected/layout",
+        "file": "app/routes/protected/nurse/AssignedPatientsPage.tsx",
+        "path": "nurse/patients",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/protected/nurse/VitalsEntryPage": {
+        "id": "routes/protected/nurse/VitalsEntryPage",
+        "parentId": "routes/protected/layout",
+        "file": "app/routes/protected/nurse/VitalsEntryPage.tsx",
+        "path": "nurse/vitals",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/protected/nurse/MedicationsPage": {
+        "id": "routes/protected/nurse/MedicationsPage",
+        "parentId": "routes/protected/layout",
+        "file": "app/routes/protected/nurse/MedicationsPage.tsx",
+        "path": "nurse/medications",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/protected/nurse/ProgressNotesPage": {
+        "id": "routes/protected/nurse/ProgressNotesPage",
+        "parentId": "routes/protected/layout",
+        "file": "app/routes/protected/nurse/ProgressNotesPage.tsx",
+        "path": "nurse/notes",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/protected/nurse/WardOverviewPage": {
+        "id": "routes/protected/nurse/WardOverviewPage",
+        "parentId": "routes/protected/layout",
+        "file": "app/routes/protected/nurse/WardOverviewPage.tsx",
+        "path": "nurse/ward",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/protected/nurse/MessagesPage": {
+        "id": "routes/protected/nurse/MessagesPage",
+        "parentId": "routes/protected/layout",
+        "file": "app/routes/protected/nurse/MessagesPage.tsx",
+        "path": "nurse/messages",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/protected/nurse/SettingsPage": {
+        "id": "routes/protected/nurse/SettingsPage",
+        "parentId": "routes/protected/layout",
+        "file": "app/routes/protected/nurse/SettingsPage.tsx",
+        "path": "nurse/settings",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/protected/patient/PatientDashboard": {
+        "id": "routes/protected/patient/PatientDashboard",
+        "parentId": "routes/protected/layout",
+        "file": "app/routes/protected/patient/PatientDashboard.tsx",
+        "path": "patient/dashboard",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/protected/patient/AppointmentsPage": {
+        "id": "routes/protected/patient/AppointmentsPage",
+        "parentId": "routes/protected/layout",
+        "file": "app/routes/protected/patient/AppointmentsPage.tsx",
+        "path": "patient/appointments",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/protected/patient/MedicalRecordsPage": {
+        "id": "routes/protected/patient/MedicalRecordsPage",
+        "parentId": "routes/protected/layout",
+        "file": "app/routes/protected/patient/MedicalRecordsPage.tsx",
+        "path": "patient/records",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/protected/patient/LabResultsPage": {
+        "id": "routes/protected/patient/LabResultsPage",
+        "parentId": "routes/protected/layout",
+        "file": "app/routes/protected/patient/LabResultsPage.tsx",
+        "path": "patient/lab-results",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/protected/patient/PrescriptionsPage": {
+        "id": "routes/protected/patient/PrescriptionsPage",
+        "parentId": "routes/protected/layout",
+        "file": "app/routes/protected/patient/PrescriptionsPage.tsx",
+        "path": "patient/prescriptions",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/protected/patient/BillsPage": {
+        "id": "routes/protected/patient/BillsPage",
+        "parentId": "routes/protected/layout",
+        "file": "app/routes/protected/patient/BillsPage.tsx",
+        "path": "patient/bills",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/protected/patient/MessagesPage": {
+        "id": "routes/protected/patient/MessagesPage",
+        "parentId": "routes/protected/layout",
+        "file": "app/routes/protected/patient/MessagesPage.tsx",
+        "path": "patient/messages",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/protected/patient/HealthInsightsPage": {
+        "id": "routes/protected/patient/HealthInsightsPage",
+        "parentId": "routes/protected/layout",
+        "file": "app/routes/protected/patient/HealthInsightsPage.tsx",
+        "path": "patient/health-insights",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/protected/patient/SettingsPage": {
+        "id": "routes/protected/patient/SettingsPage",
+        "parentId": "routes/protected/layout",
+        "file": "app/routes/protected/patient/SettingsPage.tsx",
+        "path": "patient/settings",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/protected/reception/ReceptionDashboard": {
+        "id": "routes/protected/reception/ReceptionDashboard",
+        "parentId": "routes/protected/layout",
+        "file": "app/routes/protected/reception/ReceptionDashboard.tsx",
+        "path": "reception/dashboard",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/protected/reception/RegisterPatientPage": {
+        "id": "routes/protected/reception/RegisterPatientPage",
+        "parentId": "routes/protected/layout",
+        "file": "app/routes/protected/reception/RegisterPatientPage.tsx",
+        "path": "reception/register",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/protected/reception/AppointmentsPage": {
+        "id": "routes/protected/reception/AppointmentsPage",
+        "parentId": "routes/protected/layout",
+        "file": "app/routes/protected/reception/AppointmentsPage.tsx",
+        "path": "reception/appointments",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/protected/reception/QueueManagerPage": {
+        "id": "routes/protected/reception/QueueManagerPage",
+        "parentId": "routes/protected/layout",
+        "file": "app/routes/protected/reception/QueueManagerPage.tsx",
+        "path": "reception/queue",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/protected/reception/CheckInPage": {
+        "id": "routes/protected/reception/CheckInPage",
+        "parentId": "routes/protected/layout",
+        "file": "app/routes/protected/reception/CheckInPage.tsx",
+        "path": "reception/check-in",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/protected/reception/MessagesPage": {
+        "id": "routes/protected/reception/MessagesPage",
+        "parentId": "routes/protected/layout",
+        "file": "app/routes/protected/reception/MessagesPage.tsx",
+        "path": "reception/messages",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/protected/reception/SettingsPage": {
+        "id": "routes/protected/reception/SettingsPage",
+        "parentId": "routes/protected/layout",
+        "file": "app/routes/protected/reception/SettingsPage.tsx",
+        "path": "reception/settings",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/protected/pharmacy/PharmacyDashboard": {
+        "id": "routes/protected/pharmacy/PharmacyDashboard",
+        "parentId": "routes/protected/layout",
+        "file": "app/routes/protected/pharmacy/PharmacyDashboard.tsx",
+        "path": "pharmacy/dashboard",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/protected/pharmacy/PrescriptionsPage": {
+        "id": "routes/protected/pharmacy/PrescriptionsPage",
+        "parentId": "routes/protected/layout",
+        "file": "app/routes/protected/pharmacy/PrescriptionsPage.tsx",
+        "path": "pharmacy/prescriptions",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/protected/pharmacy/InventoryPage": {
+        "id": "routes/protected/pharmacy/InventoryPage",
+        "parentId": "routes/protected/layout",
+        "file": "app/routes/protected/pharmacy/InventoryPage.tsx",
+        "path": "pharmacy/inventory",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/protected/pharmacy/DispensePage": {
+        "id": "routes/protected/pharmacy/DispensePage",
+        "parentId": "routes/protected/layout",
+        "file": "app/routes/protected/pharmacy/DispensePage.tsx",
+        "path": "pharmacy/dispense",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/protected/pharmacy/DrugOrdersPage": {
+        "id": "routes/protected/pharmacy/DrugOrdersPage",
+        "parentId": "routes/protected/layout",
+        "file": "app/routes/protected/pharmacy/DrugOrdersPage.tsx",
+        "path": "pharmacy/drug-orders",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/protected/pharmacy/DrugInteractionsPage": {
+        "id": "routes/protected/pharmacy/DrugInteractionsPage",
+        "parentId": "routes/protected/layout",
+        "file": "app/routes/protected/pharmacy/DrugInteractionsPage.tsx",
+        "path": "pharmacy/drug-interactions",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/protected/pharmacy/MessagesPage": {
+        "id": "routes/protected/pharmacy/MessagesPage",
+        "parentId": "routes/protected/layout",
+        "file": "app/routes/protected/pharmacy/MessagesPage.tsx",
+        "path": "pharmacy/messages",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/protected/pharmacy/SettingsPage": {
+        "id": "routes/protected/pharmacy/SettingsPage",
+        "parentId": "routes/protected/layout",
+        "file": "app/routes/protected/pharmacy/SettingsPage.tsx",
+        "path": "pharmacy/settings",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/protected/lab/LabDashboard": {
+        "id": "routes/protected/lab/LabDashboard",
+        "parentId": "routes/protected/layout",
+        "file": "app/routes/protected/lab/LabDashboard.tsx",
+        "path": "lab/dashboard",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/protected/lab/TestRequestsPage": {
+        "id": "routes/protected/lab/TestRequestsPage",
+        "parentId": "routes/protected/layout",
+        "file": "app/routes/protected/lab/TestRequestsPage.tsx",
+        "path": "lab/test-requests",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/protected/lab/ResultsEntryPage": {
+        "id": "routes/protected/lab/ResultsEntryPage",
+        "parentId": "routes/protected/layout",
+        "file": "app/routes/protected/lab/ResultsEntryPage.tsx",
+        "path": "lab/results-entry",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/protected/lab/SampleTrackingPage": {
+        "id": "routes/protected/lab/SampleTrackingPage",
+        "parentId": "routes/protected/layout",
+        "file": "app/routes/protected/lab/SampleTrackingPage.tsx",
+        "path": "lab/sample-tracking",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/protected/lab/EquipmentLogPage": {
+        "id": "routes/protected/lab/EquipmentLogPage",
+        "parentId": "routes/protected/layout",
+        "file": "app/routes/protected/lab/EquipmentLogPage.tsx",
+        "path": "lab/equipment",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/protected/lab/RadiologyPage": {
+        "id": "routes/protected/lab/RadiologyPage",
+        "parentId": "routes/protected/layout",
+        "file": "app/routes/protected/lab/RadiologyPage.tsx",
+        "path": "lab/radiology",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/protected/lab/MessagesPage": {
+        "id": "routes/protected/lab/MessagesPage",
+        "parentId": "routes/protected/layout",
+        "file": "app/routes/protected/lab/MessagesPage.tsx",
+        "path": "lab/messages",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/protected/lab/SettingsPage": {
+        "id": "routes/protected/lab/SettingsPage",
+        "parentId": "routes/protected/layout",
+        "file": "app/routes/protected/lab/SettingsPage.tsx",
+        "path": "lab/settings",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/protected/billing/BillingDashboard": {
+        "id": "routes/protected/billing/BillingDashboard",
+        "parentId": "routes/protected/layout",
+        "file": "app/routes/protected/billing/BillingDashboard.tsx",
+        "path": "billing/dashboard",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/protected/billing/InvoicesPage": {
+        "id": "routes/protected/billing/InvoicesPage",
+        "parentId": "routes/protected/layout",
+        "file": "app/routes/protected/billing/InvoicesPage.tsx",
+        "path": "billing/invoices",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/protected/billing/PaymentsPage": {
+        "id": "routes/protected/billing/PaymentsPage",
+        "parentId": "routes/protected/layout",
+        "file": "app/routes/protected/billing/PaymentsPage.tsx",
+        "path": "billing/payments",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/protected/billing/InsuranceClaimsPage": {
+        "id": "routes/protected/billing/InsuranceClaimsPage",
+        "parentId": "routes/protected/layout",
+        "file": "app/routes/protected/billing/InsuranceClaimsPage.tsx",
+        "path": "billing/insurance-claims",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/protected/billing/OutstandingPage": {
+        "id": "routes/protected/billing/OutstandingPage",
+        "parentId": "routes/protected/layout",
+        "file": "app/routes/protected/billing/OutstandingPage.tsx",
+        "path": "billing/outstanding",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/protected/billing/ReportsPage": {
+        "id": "routes/protected/billing/ReportsPage",
+        "parentId": "routes/protected/layout",
+        "file": "app/routes/protected/billing/ReportsPage.tsx",
+        "path": "billing/reports",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/protected/billing/MessagesPage": {
+        "id": "routes/protected/billing/MessagesPage",
+        "parentId": "routes/protected/layout",
+        "file": "app/routes/protected/billing/MessagesPage.tsx",
+        "path": "billing/messages",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/protected/billing/SettingsPage": {
+        "id": "routes/protected/billing/SettingsPage",
+        "parentId": "routes/protected/layout",
+        "file": "app/routes/protected/billing/SettingsPage.tsx",
+        "path": "billing/settings",
+        "config": {
+          "runtime": "nodejs"
+        }
+      }
+    }
+  },
+  "reactRouterConfig": {
+    "appDirectory": "/home/daniel/Documents/file project/HMS/clients/app",
+    "basename": "/",
+    "buildDirectory": "/home/daniel/Documents/file project/HMS/clients/build",
+    "future": {
+      "unstable_optimizeDeps": false,
+      "v8_passThroughRequests": false,
+      "v8_trailingSlashAwareDataRequests": false,
+      "unstable_previewServerPrerendering": false,
+      "v8_middleware": false,
+      "v8_splitRouteModules": false,
+      "v8_viteEnvironmentApi": false
+    },
+    "routes": {
+      "root": {
+        "id": "root",
+        "file": "root.tsx",
+        "path": ""
+      },
+      "routes/home": {
+        "id": "routes/home",
+        "parentId": "root",
+        "file": "routes/home.tsx",
+        "index": true
+      },
+      "routes/room": {
+        "id": "routes/room",
+        "parentId": "root",
+        "file": "routes/room.tsx",
+        "path": "room"
+      },
+      "routes/login": {
+        "id": "routes/login",
+        "parentId": "root",
+        "file": "routes/login.tsx",
+        "path": "login"
+      },
+      "routes/register": {
+        "id": "routes/register",
+        "parentId": "root",
+        "file": "routes/register.tsx",
+        "path": "register"
+      },
+      "routes/login-verify": {
+        "id": "routes/login-verify",
+        "parentId": "root",
+        "file": "routes/login-verify.tsx",
+        "path": "login/verify"
+      },
+      "routes/verify-email": {
+        "id": "routes/verify-email",
+        "parentId": "root",
+        "file": "routes/verify-email.tsx",
+        "path": "verify-email"
+      },
+      "routes/complete-profile": {
+        "id": "routes/complete-profile",
+        "parentId": "root",
+        "file": "routes/complete-profile.tsx",
+        "path": "complete-profile"
+      },
+      "routes/patient-complete-profile": {
+        "id": "routes/patient-complete-profile",
+        "parentId": "root",
+        "file": "routes/patient-complete-profile.tsx",
+        "path": "patient/complete-profile"
+      },
+      "routes/activate-account": {
+        "id": "routes/activate-account",
+        "parentId": "root",
+        "file": "routes/activate-account.tsx",
+        "path": "activate-account"
+      },
+      "routes/accept-invitation": {
+        "id": "routes/accept-invitation",
+        "parentId": "root",
+        "file": "routes/accept-invitation.tsx",
+        "path": "accept-invitation"
+      },
+      "routes/protected/layout": {
+        "id": "routes/protected/layout",
+        "parentId": "root",
+        "file": "routes/protected/layout.tsx"
+      },
+      "routes/protected/administration/AdminDashboard": {
+        "id": "routes/protected/administration/AdminDashboard",
+        "parentId": "routes/protected/layout",
+        "file": "routes/protected/administration/AdminDashboard.tsx",
+        "path": "administration/dashboard"
+      },
+      "routes/protected/administration/DoctorsPage": {
+        "id": "routes/protected/administration/DoctorsPage",
+        "parentId": "routes/protected/layout",
+        "file": "routes/protected/administration/DoctorsPage.tsx",
+        "path": "administration/doctors"
+      },
+      "routes/protected/administration/PatientsPage": {
+        "id": "routes/protected/administration/PatientsPage",
+        "parentId": "routes/protected/layout",
+        "file": "routes/protected/administration/PatientsPage.tsx",
+        "path": "administration/patients"
+      },
+      "routes/protected/administration/DepartmentsPage": {
+        "id": "routes/protected/administration/DepartmentsPage",
+        "parentId": "routes/protected/layout",
+        "file": "routes/protected/administration/DepartmentsPage.tsx",
+        "path": "administration/departments"
+      },
+      "routes/protected/administration/AppointmentsPage": {
+        "id": "routes/protected/administration/AppointmentsPage",
+        "parentId": "routes/protected/layout",
+        "file": "routes/protected/administration/AppointmentsPage.tsx",
+        "path": "administration/appointments"
+      },
+      "routes/protected/administration/ReportsPage": {
+        "id": "routes/protected/administration/ReportsPage",
+        "parentId": "routes/protected/layout",
+        "file": "routes/protected/administration/ReportsPage.tsx",
+        "path": "administration/reports"
+      },
+      "routes/protected/administration/RoomsBedsPage": {
+        "id": "routes/protected/administration/RoomsBedsPage",
+        "parentId": "routes/protected/layout",
+        "file": "routes/protected/administration/RoomsBedsPage.tsx",
+        "path": "administration/rooms-beds"
+      },
+      "routes/protected/administration/SystemLogsPage": {
+        "id": "routes/protected/administration/SystemLogsPage",
+        "parentId": "routes/protected/layout",
+        "file": "routes/protected/administration/SystemLogsPage.tsx",
+        "path": "administration/system-logs"
+      },
+      "routes/protected/administration/SettingsPage": {
+        "id": "routes/protected/administration/SettingsPage",
+        "parentId": "routes/protected/layout",
+        "file": "routes/protected/administration/SettingsPage.tsx",
+        "path": "administration/settings"
+      },
+      "routes/protected/administration/UsersPage": {
+        "id": "routes/protected/administration/UsersPage",
+        "parentId": "routes/protected/layout",
+        "file": "routes/protected/administration/UsersPage.tsx",
+        "path": "administration/users"
+      },
+      "routes/protected/doctor/DoctorDashboard": {
+        "id": "routes/protected/doctor/DoctorDashboard",
+        "parentId": "routes/protected/layout",
+        "file": "routes/protected/doctor/DoctorDashboard.tsx",
+        "path": "doctor/dashboard"
+      },
+      "routes/protected/doctor/AppointmentsPage": {
+        "id": "routes/protected/doctor/AppointmentsPage",
+        "parentId": "routes/protected/layout",
+        "file": "routes/protected/doctor/AppointmentsPage.tsx",
+        "path": "doctor/appointments"
+      },
+      "routes/protected/doctor/PatientsPage": {
+        "id": "routes/protected/doctor/PatientsPage",
+        "parentId": "routes/protected/layout",
+        "file": "routes/protected/doctor/PatientsPage.tsx",
+        "path": "doctor/patients"
+      },
+      "routes/protected/doctor/PrescriptionsPage": {
+        "id": "routes/protected/doctor/PrescriptionsPage",
+        "parentId": "routes/protected/layout",
+        "file": "routes/protected/doctor/PrescriptionsPage.tsx",
+        "path": "doctor/prescriptions"
+      },
+      "routes/protected/doctor/LabOrdersPage": {
+        "id": "routes/protected/doctor/LabOrdersPage",
+        "parentId": "routes/protected/layout",
+        "file": "routes/protected/doctor/LabOrdersPage.tsx",
+        "path": "doctor/lab-orders"
+      },
+      "routes/protected/doctor/EMRPage": {
+        "id": "routes/protected/doctor/EMRPage",
+        "parentId": "routes/protected/layout",
+        "file": "routes/protected/doctor/EMRPage.tsx",
+        "path": "doctor/emr"
+      },
+      "routes/protected/doctor/MessagesPage": {
+        "id": "routes/protected/doctor/MessagesPage",
+        "parentId": "routes/protected/layout",
+        "file": "routes/protected/doctor/MessagesPage.tsx",
+        "path": "doctor/messages"
+      },
+      "routes/protected/doctor/SchedulePage": {
+        "id": "routes/protected/doctor/SchedulePage",
+        "parentId": "routes/protected/layout",
+        "file": "routes/protected/doctor/SchedulePage.tsx",
+        "path": "doctor/schedule"
+      },
+      "routes/protected/doctor/AnalyticsPage": {
+        "id": "routes/protected/doctor/AnalyticsPage",
+        "parentId": "routes/protected/layout",
+        "file": "routes/protected/doctor/AnalyticsPage.tsx",
+        "path": "doctor/analytics"
+      },
+      "routes/protected/doctor/SettingsPage": {
+        "id": "routes/protected/doctor/SettingsPage",
+        "parentId": "routes/protected/layout",
+        "file": "routes/protected/doctor/SettingsPage.tsx",
+        "path": "doctor/settings"
+      },
+      "routes/protected/nurse/NurseDashboard": {
+        "id": "routes/protected/nurse/NurseDashboard",
+        "parentId": "routes/protected/layout",
+        "file": "routes/protected/nurse/NurseDashboard.tsx",
+        "path": "nurse/dashboard"
+      },
+      "routes/protected/nurse/AssignedPatientsPage": {
+        "id": "routes/protected/nurse/AssignedPatientsPage",
+        "parentId": "routes/protected/layout",
+        "file": "routes/protected/nurse/AssignedPatientsPage.tsx",
+        "path": "nurse/patients"
+      },
+      "routes/protected/nurse/VitalsEntryPage": {
+        "id": "routes/protected/nurse/VitalsEntryPage",
+        "parentId": "routes/protected/layout",
+        "file": "routes/protected/nurse/VitalsEntryPage.tsx",
+        "path": "nurse/vitals"
+      },
+      "routes/protected/nurse/MedicationsPage": {
+        "id": "routes/protected/nurse/MedicationsPage",
+        "parentId": "routes/protected/layout",
+        "file": "routes/protected/nurse/MedicationsPage.tsx",
+        "path": "nurse/medications"
+      },
+      "routes/protected/nurse/ProgressNotesPage": {
+        "id": "routes/protected/nurse/ProgressNotesPage",
+        "parentId": "routes/protected/layout",
+        "file": "routes/protected/nurse/ProgressNotesPage.tsx",
+        "path": "nurse/notes"
+      },
+      "routes/protected/nurse/WardOverviewPage": {
+        "id": "routes/protected/nurse/WardOverviewPage",
+        "parentId": "routes/protected/layout",
+        "file": "routes/protected/nurse/WardOverviewPage.tsx",
+        "path": "nurse/ward"
+      },
+      "routes/protected/nurse/MessagesPage": {
+        "id": "routes/protected/nurse/MessagesPage",
+        "parentId": "routes/protected/layout",
+        "file": "routes/protected/nurse/MessagesPage.tsx",
+        "path": "nurse/messages"
+      },
+      "routes/protected/nurse/SettingsPage": {
+        "id": "routes/protected/nurse/SettingsPage",
+        "parentId": "routes/protected/layout",
+        "file": "routes/protected/nurse/SettingsPage.tsx",
+        "path": "nurse/settings"
+      },
+      "routes/protected/patient/PatientDashboard": {
+        "id": "routes/protected/patient/PatientDashboard",
+        "parentId": "routes/protected/layout",
+        "file": "routes/protected/patient/PatientDashboard.tsx",
+        "path": "patient/dashboard"
+      },
+      "routes/protected/patient/AppointmentsPage": {
+        "id": "routes/protected/patient/AppointmentsPage",
+        "parentId": "routes/protected/layout",
+        "file": "routes/protected/patient/AppointmentsPage.tsx",
+        "path": "patient/appointments"
+      },
+      "routes/protected/patient/MedicalRecordsPage": {
+        "id": "routes/protected/patient/MedicalRecordsPage",
+        "parentId": "routes/protected/layout",
+        "file": "routes/protected/patient/MedicalRecordsPage.tsx",
+        "path": "patient/records"
+      },
+      "routes/protected/patient/LabResultsPage": {
+        "id": "routes/protected/patient/LabResultsPage",
+        "parentId": "routes/protected/layout",
+        "file": "routes/protected/patient/LabResultsPage.tsx",
+        "path": "patient/lab-results"
+      },
+      "routes/protected/patient/PrescriptionsPage": {
+        "id": "routes/protected/patient/PrescriptionsPage",
+        "parentId": "routes/protected/layout",
+        "file": "routes/protected/patient/PrescriptionsPage.tsx",
+        "path": "patient/prescriptions"
+      },
+      "routes/protected/patient/BillsPage": {
+        "id": "routes/protected/patient/BillsPage",
+        "parentId": "routes/protected/layout",
+        "file": "routes/protected/patient/BillsPage.tsx",
+        "path": "patient/bills"
+      },
+      "routes/protected/patient/MessagesPage": {
+        "id": "routes/protected/patient/MessagesPage",
+        "parentId": "routes/protected/layout",
+        "file": "routes/protected/patient/MessagesPage.tsx",
+        "path": "patient/messages"
+      },
+      "routes/protected/patient/HealthInsightsPage": {
+        "id": "routes/protected/patient/HealthInsightsPage",
+        "parentId": "routes/protected/layout",
+        "file": "routes/protected/patient/HealthInsightsPage.tsx",
+        "path": "patient/health-insights"
+      },
+      "routes/protected/patient/SettingsPage": {
+        "id": "routes/protected/patient/SettingsPage",
+        "parentId": "routes/protected/layout",
+        "file": "routes/protected/patient/SettingsPage.tsx",
+        "path": "patient/settings"
+      },
+      "routes/protected/reception/ReceptionDashboard": {
+        "id": "routes/protected/reception/ReceptionDashboard",
+        "parentId": "routes/protected/layout",
+        "file": "routes/protected/reception/ReceptionDashboard.tsx",
+        "path": "reception/dashboard"
+      },
+      "routes/protected/reception/RegisterPatientPage": {
+        "id": "routes/protected/reception/RegisterPatientPage",
+        "parentId": "routes/protected/layout",
+        "file": "routes/protected/reception/RegisterPatientPage.tsx",
+        "path": "reception/register"
+      },
+      "routes/protected/reception/AppointmentsPage": {
+        "id": "routes/protected/reception/AppointmentsPage",
+        "parentId": "routes/protected/layout",
+        "file": "routes/protected/reception/AppointmentsPage.tsx",
+        "path": "reception/appointments"
+      },
+      "routes/protected/reception/QueueManagerPage": {
+        "id": "routes/protected/reception/QueueManagerPage",
+        "parentId": "routes/protected/layout",
+        "file": "routes/protected/reception/QueueManagerPage.tsx",
+        "path": "reception/queue"
+      },
+      "routes/protected/reception/CheckInPage": {
+        "id": "routes/protected/reception/CheckInPage",
+        "parentId": "routes/protected/layout",
+        "file": "routes/protected/reception/CheckInPage.tsx",
+        "path": "reception/check-in"
+      },
+      "routes/protected/reception/MessagesPage": {
+        "id": "routes/protected/reception/MessagesPage",
+        "parentId": "routes/protected/layout",
+        "file": "routes/protected/reception/MessagesPage.tsx",
+        "path": "reception/messages"
+      },
+      "routes/protected/reception/SettingsPage": {
+        "id": "routes/protected/reception/SettingsPage",
+        "parentId": "routes/protected/layout",
+        "file": "routes/protected/reception/SettingsPage.tsx",
+        "path": "reception/settings"
+      },
+      "routes/protected/pharmacy/PharmacyDashboard": {
+        "id": "routes/protected/pharmacy/PharmacyDashboard",
+        "parentId": "routes/protected/layout",
+        "file": "routes/protected/pharmacy/PharmacyDashboard.tsx",
+        "path": "pharmacy/dashboard"
+      },
+      "routes/protected/pharmacy/PrescriptionsPage": {
+        "id": "routes/protected/pharmacy/PrescriptionsPage",
+        "parentId": "routes/protected/layout",
+        "file": "routes/protected/pharmacy/PrescriptionsPage.tsx",
+        "path": "pharmacy/prescriptions"
+      },
+      "routes/protected/pharmacy/InventoryPage": {
+        "id": "routes/protected/pharmacy/InventoryPage",
+        "parentId": "routes/protected/layout",
+        "file": "routes/protected/pharmacy/InventoryPage.tsx",
+        "path": "pharmacy/inventory"
+      },
+      "routes/protected/pharmacy/DispensePage": {
+        "id": "routes/protected/pharmacy/DispensePage",
+        "parentId": "routes/protected/layout",
+        "file": "routes/protected/pharmacy/DispensePage.tsx",
+        "path": "pharmacy/dispense"
+      },
+      "routes/protected/pharmacy/DrugOrdersPage": {
+        "id": "routes/protected/pharmacy/DrugOrdersPage",
+        "parentId": "routes/protected/layout",
+        "file": "routes/protected/pharmacy/DrugOrdersPage.tsx",
+        "path": "pharmacy/drug-orders"
+      },
+      "routes/protected/pharmacy/DrugInteractionsPage": {
+        "id": "routes/protected/pharmacy/DrugInteractionsPage",
+        "parentId": "routes/protected/layout",
+        "file": "routes/protected/pharmacy/DrugInteractionsPage.tsx",
+        "path": "pharmacy/drug-interactions"
+      },
+      "routes/protected/pharmacy/MessagesPage": {
+        "id": "routes/protected/pharmacy/MessagesPage",
+        "parentId": "routes/protected/layout",
+        "file": "routes/protected/pharmacy/MessagesPage.tsx",
+        "path": "pharmacy/messages"
+      },
+      "routes/protected/pharmacy/SettingsPage": {
+        "id": "routes/protected/pharmacy/SettingsPage",
+        "parentId": "routes/protected/layout",
+        "file": "routes/protected/pharmacy/SettingsPage.tsx",
+        "path": "pharmacy/settings"
+      },
+      "routes/protected/lab/LabDashboard": {
+        "id": "routes/protected/lab/LabDashboard",
+        "parentId": "routes/protected/layout",
+        "file": "routes/protected/lab/LabDashboard.tsx",
+        "path": "lab/dashboard"
+      },
+      "routes/protected/lab/TestRequestsPage": {
+        "id": "routes/protected/lab/TestRequestsPage",
+        "parentId": "routes/protected/layout",
+        "file": "routes/protected/lab/TestRequestsPage.tsx",
+        "path": "lab/test-requests"
+      },
+      "routes/protected/lab/ResultsEntryPage": {
+        "id": "routes/protected/lab/ResultsEntryPage",
+        "parentId": "routes/protected/layout",
+        "file": "routes/protected/lab/ResultsEntryPage.tsx",
+        "path": "lab/results-entry"
+      },
+      "routes/protected/lab/SampleTrackingPage": {
+        "id": "routes/protected/lab/SampleTrackingPage",
+        "parentId": "routes/protected/layout",
+        "file": "routes/protected/lab/SampleTrackingPage.tsx",
+        "path": "lab/sample-tracking"
+      },
+      "routes/protected/lab/EquipmentLogPage": {
+        "id": "routes/protected/lab/EquipmentLogPage",
+        "parentId": "routes/protected/layout",
+        "file": "routes/protected/lab/EquipmentLogPage.tsx",
+        "path": "lab/equipment"
+      },
+      "routes/protected/lab/RadiologyPage": {
+        "id": "routes/protected/lab/RadiologyPage",
+        "parentId": "routes/protected/layout",
+        "file": "routes/protected/lab/RadiologyPage.tsx",
+        "path": "lab/radiology"
+      },
+      "routes/protected/lab/MessagesPage": {
+        "id": "routes/protected/lab/MessagesPage",
+        "parentId": "routes/protected/layout",
+        "file": "routes/protected/lab/MessagesPage.tsx",
+        "path": "lab/messages"
+      },
+      "routes/protected/lab/SettingsPage": {
+        "id": "routes/protected/lab/SettingsPage",
+        "parentId": "routes/protected/layout",
+        "file": "routes/protected/lab/SettingsPage.tsx",
+        "path": "lab/settings"
+      },
+      "routes/protected/billing/BillingDashboard": {
+        "id": "routes/protected/billing/BillingDashboard",
+        "parentId": "routes/protected/layout",
+        "file": "routes/protected/billing/BillingDashboard.tsx",
+        "path": "billing/dashboard"
+      },
+      "routes/protected/billing/InvoicesPage": {
+        "id": "routes/protected/billing/InvoicesPage",
+        "parentId": "routes/protected/layout",
+        "file": "routes/protected/billing/InvoicesPage.tsx",
+        "path": "billing/invoices"
+      },
+      "routes/protected/billing/PaymentsPage": {
+        "id": "routes/protected/billing/PaymentsPage",
+        "parentId": "routes/protected/layout",
+        "file": "routes/protected/billing/PaymentsPage.tsx",
+        "path": "billing/payments"
+      },
+      "routes/protected/billing/InsuranceClaimsPage": {
+        "id": "routes/protected/billing/InsuranceClaimsPage",
+        "parentId": "routes/protected/layout",
+        "file": "routes/protected/billing/InsuranceClaimsPage.tsx",
+        "path": "billing/insurance-claims"
+      },
+      "routes/protected/billing/OutstandingPage": {
+        "id": "routes/protected/billing/OutstandingPage",
+        "parentId": "routes/protected/layout",
+        "file": "routes/protected/billing/OutstandingPage.tsx",
+        "path": "billing/outstanding"
+      },
+      "routes/protected/billing/ReportsPage": {
+        "id": "routes/protected/billing/ReportsPage",
+        "parentId": "routes/protected/layout",
+        "file": "routes/protected/billing/ReportsPage.tsx",
+        "path": "billing/reports"
+      },
+      "routes/protected/billing/MessagesPage": {
+        "id": "routes/protected/billing/MessagesPage",
+        "parentId": "routes/protected/layout",
+        "file": "routes/protected/billing/MessagesPage.tsx",
+        "path": "billing/messages"
+      },
+      "routes/protected/billing/SettingsPage": {
+        "id": "routes/protected/billing/SettingsPage",
+        "parentId": "routes/protected/layout",
+        "file": "routes/protected/billing/SettingsPage.tsx",
+        "path": "billing/settings"
+      }
+    },
+    "routeDiscovery": {
+      "mode": "lazy",
+      "manifestPath": "/__manifest"
+    },
+    "serverBuildFile": "index.js",
+    "serverModuleFormat": "esm",
+    "ssr": true,
+    "subResourceIntegrity": false,
+    "allowedActionOrigins": false,
+    "unstable_routeConfig": [
+      {
+        "id": "root",
+        "path": "",
+        "file": "root.tsx",
+        "children": [
+          {
+            "file": "routes/home.tsx",
+            "index": true
+          },
+          {
+            "file": "routes/room.tsx",
+            "path": "room"
+          },
+          {
+            "file": "routes/login.tsx",
+            "path": "login"
+          },
+          {
+            "file": "routes/register.tsx",
+            "path": "register"
+          },
+          {
+            "file": "routes/login-verify.tsx",
+            "path": "login/verify"
+          },
+          {
+            "file": "routes/verify-email.tsx",
+            "path": "verify-email"
+          },
+          {
+            "file": "routes/complete-profile.tsx",
+            "path": "complete-profile"
+          },
+          {
+            "file": "routes/patient-complete-profile.tsx",
+            "path": "patient/complete-profile"
+          },
+          {
+            "file": "routes/activate-account.tsx",
+            "path": "activate-account"
+          },
+          {
+            "file": "routes/accept-invitation.tsx",
+            "path": "accept-invitation"
+          },
+          {
+            "file": "routes/protected/layout.tsx",
+            "children": [
+              {
+                "file": "routes/protected/administration/AdminDashboard.tsx",
+                "path": "administration/dashboard"
+              },
+              {
+                "file": "routes/protected/administration/DoctorsPage.tsx",
+                "path": "administration/doctors"
+              },
+              {
+                "file": "routes/protected/administration/PatientsPage.tsx",
+                "path": "administration/patients"
+              },
+              {
+                "file": "routes/protected/administration/DepartmentsPage.tsx",
+                "path": "administration/departments"
+              },
+              {
+                "file": "routes/protected/administration/AppointmentsPage.tsx",
+                "path": "administration/appointments"
+              },
+              {
+                "file": "routes/protected/administration/ReportsPage.tsx",
+                "path": "administration/reports"
+              },
+              {
+                "file": "routes/protected/administration/RoomsBedsPage.tsx",
+                "path": "administration/rooms-beds"
+              },
+              {
+                "file": "routes/protected/administration/SystemLogsPage.tsx",
+                "path": "administration/system-logs"
+              },
+              {
+                "file": "routes/protected/administration/SettingsPage.tsx",
+                "path": "administration/settings"
+              },
+              {
+                "file": "routes/protected/administration/UsersPage.tsx",
+                "path": "administration/users"
+              },
+              {
+                "file": "routes/protected/doctor/DoctorDashboard.tsx",
+                "path": "doctor/dashboard"
+              },
+              {
+                "file": "routes/protected/doctor/AppointmentsPage.tsx",
+                "path": "doctor/appointments"
+              },
+              {
+                "file": "routes/protected/doctor/PatientsPage.tsx",
+                "path": "doctor/patients"
+              },
+              {
+                "file": "routes/protected/doctor/PrescriptionsPage.tsx",
+                "path": "doctor/prescriptions"
+              },
+              {
+                "file": "routes/protected/doctor/LabOrdersPage.tsx",
+                "path": "doctor/lab-orders"
+              },
+              {
+                "file": "routes/protected/doctor/EMRPage.tsx",
+                "path": "doctor/emr"
+              },
+              {
+                "file": "routes/protected/doctor/MessagesPage.tsx",
+                "path": "doctor/messages"
+              },
+              {
+                "file": "routes/protected/doctor/SchedulePage.tsx",
+                "path": "doctor/schedule"
+              },
+              {
+                "file": "routes/protected/doctor/AnalyticsPage.tsx",
+                "path": "doctor/analytics"
+              },
+              {
+                "file": "routes/protected/doctor/SettingsPage.tsx",
+                "path": "doctor/settings"
+              },
+              {
+                "file": "routes/protected/nurse/NurseDashboard.tsx",
+                "path": "nurse/dashboard"
+              },
+              {
+                "file": "routes/protected/nurse/AssignedPatientsPage.tsx",
+                "path": "nurse/patients"
+              },
+              {
+                "file": "routes/protected/nurse/VitalsEntryPage.tsx",
+                "path": "nurse/vitals"
+              },
+              {
+                "file": "routes/protected/nurse/MedicationsPage.tsx",
+                "path": "nurse/medications"
+              },
+              {
+                "file": "routes/protected/nurse/ProgressNotesPage.tsx",
+                "path": "nurse/notes"
+              },
+              {
+                "file": "routes/protected/nurse/WardOverviewPage.tsx",
+                "path": "nurse/ward"
+              },
+              {
+                "file": "routes/protected/nurse/MessagesPage.tsx",
+                "path": "nurse/messages"
+              },
+              {
+                "file": "routes/protected/nurse/SettingsPage.tsx",
+                "path": "nurse/settings"
+              },
+              {
+                "file": "routes/protected/patient/PatientDashboard.tsx",
+                "path": "patient/dashboard"
+              },
+              {
+                "file": "routes/protected/patient/AppointmentsPage.tsx",
+                "path": "patient/appointments"
+              },
+              {
+                "file": "routes/protected/patient/MedicalRecordsPage.tsx",
+                "path": "patient/records"
+              },
+              {
+                "file": "routes/protected/patient/LabResultsPage.tsx",
+                "path": "patient/lab-results"
+              },
+              {
+                "file": "routes/protected/patient/PrescriptionsPage.tsx",
+                "path": "patient/prescriptions"
+              },
+              {
+                "file": "routes/protected/patient/BillsPage.tsx",
+                "path": "patient/bills"
+              },
+              {
+                "file": "routes/protected/patient/MessagesPage.tsx",
+                "path": "patient/messages"
+              },
+              {
+                "file": "routes/protected/patient/HealthInsightsPage.tsx",
+                "path": "patient/health-insights"
+              },
+              {
+                "file": "routes/protected/patient/SettingsPage.tsx",
+                "path": "patient/settings"
+              },
+              {
+                "file": "routes/protected/reception/ReceptionDashboard.tsx",
+                "path": "reception/dashboard"
+              },
+              {
+                "file": "routes/protected/reception/RegisterPatientPage.tsx",
+                "path": "reception/register"
+              },
+              {
+                "file": "routes/protected/reception/AppointmentsPage.tsx",
+                "path": "reception/appointments"
+              },
+              {
+                "file": "routes/protected/reception/QueueManagerPage.tsx",
+                "path": "reception/queue"
+              },
+              {
+                "file": "routes/protected/reception/CheckInPage.tsx",
+                "path": "reception/check-in"
+              },
+              {
+                "file": "routes/protected/reception/MessagesPage.tsx",
+                "path": "reception/messages"
+              },
+              {
+                "file": "routes/protected/reception/SettingsPage.tsx",
+                "path": "reception/settings"
+              },
+              {
+                "file": "routes/protected/pharmacy/PharmacyDashboard.tsx",
+                "path": "pharmacy/dashboard"
+              },
+              {
+                "file": "routes/protected/pharmacy/PrescriptionsPage.tsx",
+                "path": "pharmacy/prescriptions"
+              },
+              {
+                "file": "routes/protected/pharmacy/InventoryPage.tsx",
+                "path": "pharmacy/inventory"
+              },
+              {
+                "file": "routes/protected/pharmacy/DispensePage.tsx",
+                "path": "pharmacy/dispense"
+              },
+              {
+                "file": "routes/protected/pharmacy/DrugOrdersPage.tsx",
+                "path": "pharmacy/drug-orders"
+              },
+              {
+                "file": "routes/protected/pharmacy/DrugInteractionsPage.tsx",
+                "path": "pharmacy/drug-interactions"
+              },
+              {
+                "file": "routes/protected/pharmacy/MessagesPage.tsx",
+                "path": "pharmacy/messages"
+              },
+              {
+                "file": "routes/protected/pharmacy/SettingsPage.tsx",
+                "path": "pharmacy/settings"
+              },
+              {
+                "file": "routes/protected/lab/LabDashboard.tsx",
+                "path": "lab/dashboard"
+              },
+              {
+                "file": "routes/protected/lab/TestRequestsPage.tsx",
+                "path": "lab/test-requests"
+              },
+              {
+                "file": "routes/protected/lab/ResultsEntryPage.tsx",
+                "path": "lab/results-entry"
+              },
+              {
+                "file": "routes/protected/lab/SampleTrackingPage.tsx",
+                "path": "lab/sample-tracking"
+              },
+              {
+                "file": "routes/protected/lab/EquipmentLogPage.tsx",
+                "path": "lab/equipment"
+              },
+              {
+                "file": "routes/protected/lab/RadiologyPage.tsx",
+                "path": "lab/radiology"
+              },
+              {
+                "file": "routes/protected/lab/MessagesPage.tsx",
+                "path": "lab/messages"
+              },
+              {
+                "file": "routes/protected/lab/SettingsPage.tsx",
+                "path": "lab/settings"
+              },
+              {
+                "file": "routes/protected/billing/BillingDashboard.tsx",
+                "path": "billing/dashboard"
+              },
+              {
+                "file": "routes/protected/billing/InvoicesPage.tsx",
+                "path": "billing/invoices"
+              },
+              {
+                "file": "routes/protected/billing/PaymentsPage.tsx",
+                "path": "billing/payments"
+              },
+              {
+                "file": "routes/protected/billing/InsuranceClaimsPage.tsx",
+                "path": "billing/insurance-claims"
+              },
+              {
+                "file": "routes/protected/billing/OutstandingPage.tsx",
+                "path": "billing/outstanding"
+              },
+              {
+                "file": "routes/protected/billing/ReportsPage.tsx",
+                "path": "billing/reports"
+              },
+              {
+                "file": "routes/protected/billing/MessagesPage.tsx",
+                "path": "billing/messages"
+              },
+              {
+                "file": "routes/protected/billing/SettingsPage.tsx",
+                "path": "billing/settings"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "viteConfig": {
+    "build": {
+      "assetsDir": "assets"
+    }
+  }
+}
